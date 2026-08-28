@@ -1,0 +1,37 @@
+[
+  {
+    "id": "sample-findings",
+    "claim": "The sample finds one collision, one missing image, and three fields to review.",
+    "where": "landing terminal and demo result ledger",
+    "test": "npm test -- --grep @claim:sample-findings",
+    "sandbox": "fresh browser context at /demo with the fixed fictional sample"
+  },
+  {
+    "id": "demo-privacy",
+    "claim": "Sample data is not sent away or saved with real data.",
+    "where": "demo banner and privacy page",
+    "test": "npm test -- --grep @claim:demo-privacy",
+    "sandbox": "fresh browser context; capture every request and inspect localStorage keys"
+  },
+  {
+    "id": "cli-output",
+    "claim": "The CLI reads Mealie and Tandoor folders and writes a checklist plus neutral JSON inventory.",
+    "where": "landing page, README, CLI help",
+    "test": "npm test -- --grep @claim:cli-output",
+    "sandbox": "recipe-move-check demo in a fresh temporary folder; inspect both written outputs"
+  },
+  {
+    "id": "offline-demo",
+    "claim": "The sample demo works offline after the first visit.",
+    "where": "demo documentation",
+    "test": "npm test -- --grep @claim:offline-demo",
+    "sandbox": "fresh browser context; visit /demo, wait for service worker, set offline, reload"
+  },
+  {
+    "id": "planning-pack",
+    "claim": "A valid $19 license downloads the family planning worksheet.",
+    "where": "paid section and terms",
+    "test": "npm test -- --grep @claim:planning-pack",
+    "sandbox": "fresh browser context with a recorded valid Sociobot verification response"
+  }
+]

@@ -1,0 +1,21 @@
+{
+  "name": "recipe-library-move-check-site",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite site",
+    "build:site": "vite build site --outDir ../dist/site --emptyOutDir && node scripts/copy-404.mjs",
+    "build:cli": "cargo build --release",
+    "build": "npm run build:cli && npm run build:site",
+    "preview": "vite preview --outDir dist/site",
+    "test": "cargo test && npm run build:site && playwright test",
+    "test:browser": "playwright test"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.10.2",
+    "@playwright/test": "1.58.2",
+    "typescript": "5.9.2",
+    "vite": "7.3.6"
+  }
+}
