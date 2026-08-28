@@ -18,4 +18,4 @@
 - The sample source includes Lemon Pasta and Red Lentil Soup. The destination includes Lemon Pasta and Sunday Granola.
 - The result contains one collision, one missing image, three field review items, and two ownership reviews.
 
-Both entry points use fixed sample content and need no account or network access.
+Both entry points use fixed sample content. The browser demo sends no sample recipe data to another origin.

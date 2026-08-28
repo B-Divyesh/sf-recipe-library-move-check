@@ -21,6 +21,13 @@
     "sandbox": "recipe-move-check demo in a fresh temporary folder; inspect both written outputs"
   },
   {
+    "id": "cli-local-only",
+    "claim": "The checker reads selected export folders and writes only the report and inventory paths you name.",
+    "where": "landing privacy section, privacy page, README",
+    "test": "npm test -- --grep @claim:cli-local-only",
+    "sandbox": "fresh temporary source, destination, and output folders; run check and inspect every changed path"
+  },
+  {
     "id": "offline-demo",
     "claim": "The sample demo works offline after the first visit.",
     "where": "demo documentation",
@@ -29,7 +36,7 @@
   },
   {
     "id": "planning-pack",
-    "claim": "A valid $19 license downloads the family planning worksheet.",
+    "claim": "The optional planning pack is $19 once, and a valid license downloads the family planning worksheet.",
     "where": "paid section and terms",
     "test": "npm test -- --grep @claim:planning-pack",
     "sandbox": "fresh browser context with a recorded valid Sociobot verification response"

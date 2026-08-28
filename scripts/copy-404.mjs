@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { copyFile, readFile, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 
 const indexUrl = new URL("../dist/site/index.html", import.meta.url);
 const outputRoot = new URL("../dist/site/", import.meta.url);
@@ -15,6 +15,22 @@ html = html
   .replace(`<link rel="stylesheet" crossorigin href="${stylePath}">`, `<style>${style}</style>`);
 await writeFile(indexUrl, html);
 await copyFile(indexUrl, new URL("404.html", outputRoot));
+for (const route of ["demo", "privacy", "terms"]) {
+  const routeRoot = new URL(`${route}/`, outputRoot);
+  await mkdir(routeRoot, { recursive: true });
+  await copyFile(indexUrl, new URL("index.html", routeRoot));
+}
+
+const versionedAssets = [
+  ["notebook-migration.webp", "notebook-migration.98e3f6.webp"],
+  ["og-image.webp", "og-image.a7d4c2.webp"],
+  ["favicon.svg", "favicon.4bc1a9.svg"],
+  ["apple-touch-icon.png", "apple-touch-icon.17b9e8.png"],
+];
+for (const [source, versioned] of versionedAssets) {
+  await copyFile(new URL(source, outputRoot), new URL(versioned, outputRoot));
+  await rm(new URL(source, outputRoot));
+}
 
 const digest = (value) => createHash("sha256").update(value).digest("base64");
 const configUrl = new URL("staticwebapp.config.json", outputRoot);

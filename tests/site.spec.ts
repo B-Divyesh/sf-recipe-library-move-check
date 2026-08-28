@@ -1,7 +1,9 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { execFileSync } from "node:child_process";
-import { readFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 test("@claim:sample-findings shows the completed sample findings", async ({ page }) => {
   await page.goto("/demo");
@@ -36,6 +38,22 @@ test("@claim:cli-output writes a report and neutral JSON inventory", async () =>
   rmSync(result.outputs.report.split("/move-check.md")[0], { recursive: true, force: true });
 });
 
+test("@claim:cli-local-only reads selected folders and writes only named output files", async () => {
+  const sandbox = mkdtempSync(join(tmpdir(), "recipe-move-check-local-"));
+  const source = join(sandbox, "moving");
+  const destination = join(sandbox, "existing");
+  const output = join(sandbox, "review");
+  mkdirSync(source); mkdirSync(destination); mkdirSync(output);
+  const recipe = '{"name":"Local toast","image":"missing.jpg"}';
+  writeFileSync(join(source, "recipe.json"), recipe);
+  writeFileSync(join(destination, "recipe.json"), '{"name":"Existing toast"}');
+  execFileSync("cargo", ["run", "--quiet", "--", "check", "--source", `mealie:${source}`, "--destination", `tandoor:${destination}`, "--report", join(output, "move-check.md"), "--inventory", join(output, "neutral-inventory.json")], { encoding: "utf8" });
+  expect(readFileSync(join(source, "recipe.json"), "utf8")).toBe(recipe);
+  expect(readdirSync(source)).toEqual(["recipe.json"]);
+  expect(readdirSync(output).sort()).toEqual(["move-check.md", "neutral-inventory.json"]);
+  rmSync(sandbox, { recursive: true, force: true });
+});
+
 test("@claim:offline-demo reloads the sample after the first visit", async ({ page, context }) => {
   await page.goto("/demo");
   await page.evaluate(async () => { await navigator.serviceWorker.ready; });
@@ -48,6 +66,8 @@ test("@claim:offline-demo reloads the sample after the first visit", async ({ pa
 test("@claim:planning-pack verifies a license and downloads the worksheet", async ({ page }) => {
   await page.route("https://api.sociobot.in/**", route => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ valid: true, reason: "ok" }) }));
   await page.goto("/?license=test-license");
+  await expect(page.getByText("The CLI is free. The planning pack costs $19 once.")).toBeVisible();
+  await expect(page.getByText("Optional planning pack · $19 once")).toBeVisible();
   await expect(page.getByText("Planning pack ready on this device.")).toBeVisible();
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Download planning pack" }).click();
@@ -61,7 +81,7 @@ for (const route of ["/", "/demo", "/privacy", "/terms", "/missing-page"]) {
     await page.goto(route);
     await expect(page.locator("main")).toHaveCount(1);
     await expect(page.locator("h1")).toHaveCount(1);
-    const results = await new AxeBuilder({ page }).analyze();
+    const results = await new AxeBuilder({ page: page as never }).analyze();
     expect(results.violations.filter(item => ["serious", "critical"].includes(item.impact || ""))).toEqual([]);
   });
 }
@@ -79,9 +99,23 @@ test("keyboard path reaches the sample action", async ({ page }) => {
   await expect(page).toHaveURL(/\/demo$/);
 });
 
-test("390px layout has no horizontal page overflow", async ({ page }) => {
+for (const route of ["/", "/demo"]) {
+  test(`390px ${route} layout has no horizontal page overflow`, async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
-  await expect(page.getByRole("link", { name: "Try it with sample data" })).toBeVisible();
+  await page.goto(route);
+  await expect(page.locator("h1")).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+  });
+}
+
+test("release static output has dedicated routes, a styled 404, and versioned cache policy", async () => {
+  for (const page of ["index.html", "demo/index.html", "privacy/index.html", "terms/index.html", "404.html"]) {
+    expect(readFileSync(join(process.cwd(), "dist/site", page), "utf8")).toContain("Recipe Move Check");
+  }
+  const config = JSON.parse(readFileSync(join(process.cwd(), "dist/site/staticwebapp.config.json"), "utf8"));
+  expect(config.navigationFallback).toBeUndefined();
+  expect(config.responseOverrides["404"].rewrite).toBe("/404.html");
+  const immutable = config.routes.find((route: { route: string }) => route.route === "/notebook-migration.98e3f6.webp");
+  expect(immutable.headers["Cache-Control"]).toContain("immutable");
+  expect(readFileSync(join(process.cwd(), "dist/site/index.html"), "utf8")).toContain("https://sociobot.in");
 });

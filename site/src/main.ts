@@ -24,15 +24,15 @@ function header(): string {
 function footer(): string {
   return `<footer class="site-footer"><div class="shell footer-grid">
     <p>Check a recipe move before you import.</p>
-    <nav aria-label="Footer navigation"><a href="/privacy" data-link>Privacy</a><a href="/terms" data-link>Terms</a><a href="https://www.sociobot.in" rel="noreferrer">Built by Param Factory <span class="sr-only">(external site)</span></a></nav>
+    <nav aria-label="Footer navigation"><a href="/privacy" data-link>Privacy</a><a href="/terms" data-link>Terms</a><a href="https://sociobot.in" rel="noreferrer">Built by Param Factory <span class="sr-only">(external site)</span></a></nav>
     <p class="build">Version 0.1.0 · build 2026.08.28</p>
   </div></footer>`;
 }
 
 function facts(): string {
   return `<ul class="facts" aria-label="Product facts">
-    <li><span aria-hidden="true">⌂</span> Recipes stay on your computer.</li>
-    <li><span aria-hidden="true">×</span> No account is needed.</li>
+    <li><span aria-hidden="true">⌂</span> Reads the folders you select.</li>
+    <li><span aria-hidden="true">×</span> Writes a checklist and neutral JSON.</li>
     <li><span aria-hidden="true">$</span> The CLI is free. The planning pack costs $19 once.</li>
   </ul>`;
 }
@@ -84,7 +84,7 @@ function homePage(): string {
       <div class="hero-copy"><p class="eyebrow">Mealie ↔ Tandoor preflight</p><h1 tabindex="-1">Check your recipe move before importing</h1><p class="lede">For households moving between Mealie and Tandoor who need a safe plan for the family library.</p>
         <div class="hero-actions"><a class="button" href="/demo" data-link>Try it with sample data</a><span>See a completed preflight in one click.</span></div>${facts()}
       </div>
-      <div class="hero-visual"><div class="tape" aria-hidden="true"></div><img src="/notebook-migration.webp" width="1280" height="854" alt="A lab notebook compares two recipe cards under a magnifying glass." fetchpriority="high">${terminal(true)}</div>
+      <div class="hero-visual"><div class="tape" aria-hidden="true"></div><img src="/notebook-migration.98e3f6.webp" width="1280" height="854" alt="A lab notebook compares two recipe cards under a magnifying glass." fetchpriority="high">${terminal(true)}</div>
     </section>
     <section class="preview shell" aria-label="Live product preview">${resultLedger()}</section>
     <section class="how shell" aria-labelledby="how-title"><p class="scribble">method / three steps</p><h2 id="how-title">Check before touching the destination</h2><ol>
@@ -92,8 +92,8 @@ function homePage(): string {
       <li><span>02</span><div><h3>Run one local command</h3><p>Point the checker at the moving and existing folders.</p></div></li>
       <li><span>03</span><div><h3>Review the written checklist</h3><p>Resolve collisions, images, fields, owners, and family access.</p></div></li>
     </ol></section>
-    <section id="install" class="install dark-sheet" aria-labelledby="install-title"><div class="shell install-grid"><div><p class="eyebrow">Run it locally</p><h2 id="install-title">Install the checker</h2><p>Rust 1.80 or newer is required. No server or account is involved.</p></div><div class="code-block"><button type="button" class="copy-command" data-copy="cargo install --git https://github.com/B-Divyesh/sf-recipe-library-move-check">Copy install command</button><code>cargo install --git https://github.com/<wbr>B-Divyesh/<wbr>sf-recipe-library-move-check</code></div></div></section>
-    <section class="limits shell" aria-labelledby="limits-title"><div><p class="scribble">scope boundary</p><h2 id="limits-title">Your recipes stay yours</h2></div><div><p>The CLI reads export folders and writes only the files you name.</p><p>It does not connect to servers, move recipes, or copy paid content.</p><p>Delete the report and inventory to remove its output.</p><a href="/privacy" data-link>Read the privacy details</a></div></section>
+    <section id="install" class="install dark-sheet" aria-labelledby="install-title"><div class="shell install-grid"><div><p class="eyebrow">Run it locally</p><h2 id="install-title">Install the checker</h2><p>Rust 1.80 or newer is required.</p></div><div class="code-block"><button type="button" class="copy-command" data-copy="cargo install --git https://github.com/B-Divyesh/sf-recipe-library-move-check">Copy install command</button><code>cargo install --git https://github.com/<wbr>B-Divyesh/<wbr>sf-recipe-library-move-check</code></div></div></section>
+    <section class="limits shell" aria-labelledby="limits-title"><div><p class="scribble">scope boundary</p><h2 id="limits-title">Your recipes stay yours</h2></div><div><p>The CLI reads the folders you select and writes the report and inventory paths you name.</p><p>It does not move recipes or copy paid content.</p><p>Delete the report and inventory to remove its output.</p><a href="/privacy" data-link>Read the privacy details</a></div></section>
     ${paidSection()}
   </main>${footer()}`;
 }
@@ -109,7 +109,7 @@ function demoPage(): string {
 function policyPage(kind: "privacy" | "terms"): string {
   const privacy = kind === "privacy";
   return `${header()}<main id="main" class="policy shell"><p class="eyebrow">Last updated 28 August 2026</p><h1 tabindex="-1">${privacy ? "Privacy in plain words" : "Terms for using this checker"}</h1>
-    ${privacy ? `<section><h2>The CLI stays local</h2><p>The checker reads the export folders you choose. It writes the report and inventory paths you choose. It has no telemetry and makes no network requests.</p></section><section><h2>The sample does not use your recipes</h2><p>The site demo uses fixed fictional recipes. Demo state uses a separate <code>demo:</code> browser key. Resetting or leaving the demo removes that key.</p></section><section><h2>License checks</h2><p>If you buy the optional planning pack, the site stores your license token and a dated verdict in this browser. It sends only that token to Sociobot for verification. Delete the site’s local storage to remove both values.</p></section><section><h2>Site logs</h2><p>The host may keep standard security logs. This product includes no advertising, analytics, or tracking scripts.</p></section>` : `<section><h2>Use it as a preflight</h2><p>Similarity scores are review hints. They do not prove that two recipes are the same. Keep backups and test a small import first.</p></section><section><h2>Your content remains yours</h2><p>You are responsible for the recipes and images you inspect or move. An image hash is metadata. It does not grant a right to copy an image.</p></section><section><h2>The free checker</h2><p>The CLI, Markdown report, and JSON inventory are provided under the MIT License. They come without a warranty.</p></section><section><h2>The $19 planning pack</h2><p>The planning pack is a one-time purchase. Sociobot and Dodo are the merchant of record. A refund revokes the license. The free checker remains available.</p></section>`}
+    ${privacy ? `<section><h2>The CLI uses selected folders</h2><p>The checker reads the export folders you choose. It writes the report and inventory paths you choose.</p></section><section><h2>The sample does not use your recipes</h2><p>The site demo uses fixed fictional recipes. Demo state uses a separate <code>demo:</code> browser key. Resetting or leaving the demo removes that key.</p></section><section><h2>License checks</h2><p>If you buy the optional planning pack, the site stores your license token and a dated verdict in this browser. It sends only that token to Sociobot for verification. Delete the site’s local storage to remove both values.</p></section><section><h2>Site logs</h2><p>The host may keep standard security logs.</p></section>` : `<section><h2>Use it as a preflight</h2><p>Similarity scores are review hints. They do not prove that two recipes are the same. Keep backups and test a small import first.</p></section><section><h2>Your content remains yours</h2><p>You are responsible for the recipes and images you inspect or move. An image hash is metadata. It does not grant a right to copy an image.</p></section><section><h2>The free checker</h2><p>The CLI, Markdown report, and JSON inventory are provided under the MIT License. They come without a warranty.</p></section><section><h2>The $19 planning pack</h2><p>The planning pack is a one-time purchase. Sociobot and Dodo are the merchant of record. A refund revokes the license. The free checker remains available.</p></section>`}
   </main>${footer()}`;
 }
 
@@ -148,7 +148,7 @@ function render(push = false): void {
     const h1 = document.querySelector<HTMLHeadingElement>("h1")!;
     h1.focus();
     status.textContent = `${h1.textContent} page loaded`;
-    window.scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+    window.scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
   }
 }
 

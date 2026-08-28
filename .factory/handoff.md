@@ -1,74 +1,48 @@
-# Handoff
+# Repair handoff — Recipe Library Move Check
 
-## Independent verification status — FAIL (28 August 2026)
+## Status
 
-Candidate `bdbb3a0f2182f2e3c64787a9e2733ed965679114` at `https://recipe-library-move-check.sociobot.in` **must not be released**. The full independent report is in `.factory/verification-1.md`.
+Repair commit: recorded in git after this handoff update. The Rust CLI, static product site, claims contract, and deployment configuration are buildable and verified locally. The one remaining release dependency is Sociobot production billing registration for `recipe-library-move-check`; the live checkout endpoint still returns its documented 404 and cannot be enabled from this repository.
 
-Release blockers confirmed from fresh live evidence:
+## Repairs made
 
-- The `$19` planning-pack checkout endpoint returns HTTP 404 (`{"error":"enabled factory product","status":404}`), so the advertised paid flow cannot start.
-- The core `/demo` view overflows horizontally at the required 390px viewport (482px document width).
-- Several visitor-reliant privacy/local-only claims are absent from `.factory/claims.json`, which is a claims-contract failure.
-
-Additional findings: absolute or traversal-like image paths can be read outside selected export folders; missing routes return HTTP 200; the `www.sociobot.in` footer link has invalid TLS; static assets cache for only 30 seconds; and `cargo clippy --all-targets -- -D warnings` fails.
-
-What did pass: all five declared claim commands, `npm test` (12 browser + Rust tests), the production build, package creation, clean consumer CLI install/demo, byte-identical live deployment, desktop axe serious/critical scan, keyboard flow, reduced motion, demo local-only requests, and API rate limiting (429 at request 31, Retry-After 3).
-
-## What shipped
-
-- A Rust 0.1.0 single-binary CLI named `recipe-move-check`.
-- Mealie and Tandoor folder readers for individual JSON recipes, JSON arrays, and `recipes` or `items` collections.
-- A neutral JSON inventory with ingredients, steps, tags, servings, owner, household, image status, SHA-256 image hashes, and unknown field names.
-- Collision checks using normalized names, ingredient overlap, and equal image hashes.
-- A Markdown migration checklist covering collisions, missing or external images, unmapped fields, owners, family access, backups, and a test import.
-- Helpful failure text for missing paths, unsupported systems, invalid source data, and unwritable output. An empty destination produces a valid zero-collision report.
-- `recipe-move-check demo`, which makes isolated fictional exports in a new temporary folder and prints its deletion path.
-- A static handwritten-lab-notebook product site with `/`, `/demo`, `/privacy`, `/terms`, and a styled fallback route.
-- A one-click browser demo, offline reload, keyboard navigation, reduced motion, responsive 390-pixel layout, security headers, metadata, sitemap, robots file, and service worker.
-- A $19 one-time household planning pack using the Sociobot checkout and license-verification contract. The CLI, Markdown report, and JSON inventory remain free.
-- Original hero and Open Graph art generated for this product. Provenance and the full prompt are in `.factory/design.md`.
+- Enforced the selected-export boundary for images. Absolute paths, `..` traversal paths, and symlink-resolved paths outside the selected export now receive `outside_export` with no hash and no file read. The report counts them as images requiring review.
+- Fixed the 390px demo overflow. Grid children, terminal bar, and ledger content can now shrink inside the viewport, while long terminal output scrolls only inside its own terminal pane.
+- Completed the privacy/local-output claims inventory. Added `cli-local-only` coverage and tightened copy to only promises with an observable regression test.
+- Added `npm run lint` (format plus strict Clippy) and `npm run typecheck`; fixed the prior Clippy finding.
+- Generated real static files for `/demo`, `/privacy`, and `/terms`, removed the catch-all navigation fallback, and retained the styled `404.html` response override so unknown paths can return HTTP 404 on Static Web Apps.
+- Versioned public visual assets, set immutable one-year cache headers for them and Vite assets, and set `sw.js` to `no-cache`. The service-worker cache is now `v5`.
+- Replaced the broken `https://www.sociobot.in` footer target with `https://sociobot.in`.
 
 ## Run and verify
 
 ```sh
-npm install
+npm ci
 npm test
 npm run build
-cargo run -- demo
-cargo package
+cargo package --allow-dirty --no-verify
+
+# Consumer smoke check
+cargo install --path . --root /tmp/recipe-move-check-consumer
+/tmp/recipe-move-check-consumer/bin/recipe-move-check demo --json
 ```
 
-- Required build command: `npm run build`
-- Static deployment directory: `dist/site`
-- Release binary: `target/release/recipe-move-check`
-- Browser demo: `/demo`
+- Deploy directory: `dist/site`
 - CLI demo: `recipe-move-check demo`
+- Browser demo: `/demo`
+- Every command in `.factory/claims.json` was run from the clean install and passed.
 
-Final local results on 28 August 2026:
+## Verification evidence
 
-- Rust: 5 unit tests passed; doc tests passed.
-- Playwright 1.58.2: 12 browser tests passed in Chromium.
-- Claim tests: 5 passed, including CLI outputs, demo privacy, offline reload, sample findings, and paid license download.
-- Axe: no serious or critical findings on home, demo, privacy, terms, or the fallback route.
-- Factory URL check: HTTP 200, one title, `lang=en`, one `h1`, one `main`, no missing alt text, and no console errors.
-- Lighthouse mobile: performance 100, accessibility 100, best practices 100, SEO 100.
-- Lighthouse lab metrics: LCP 1.7 seconds, CLS 0, total blocking time 0 milliseconds. Lab Lighthouse does not report a field INP value; zero blocking time and browser interaction tests are the local proxy.
-- Initial JavaScript: 15.95 KB raw / 5.83 KB gzip.
-- CSS: 12.48 KB raw / 3.70 KB gzip.
-- Hero WebP: 143 KB. Open Graph WebP: 82 KB.
-- `npm audit`: 0 vulnerabilities.
-- `cargo package --allow-dirty --no-verify`: 22 files, 25.8 KB compressed before the final handoff edit.
+- `npm ci`: passed; 0 npm audit vulnerabilities.
+- `npm test`: passed: strict format/Clippy, TypeScript check, 6 Rust tests, and 15 Chromium browser tests.
+- Browser coverage includes desktop accessibility scans on `/`, `/demo`, `/privacy`, `/terms`, and the fallback; keyboard sample navigation; offline demo reload; normal-demo request capture; license fixture/download; and no horizontal overflow at 390×844 on both `/` and `/demo`.
+- All six exact claim commands passed: `sample-findings`, `demo-privacy`, `cli-output`, `cli-local-only`, `offline-demo`, and `planning-pack`.
+- `npm run build`: passed. Latest site bundle: 15.82 KB JavaScript raw / 5.75 KB gzip and 12.76 KB CSS raw / 3.76 KB gzip.
+- `cargo package --allow-dirty --no-verify`: passed; `target/package/recipe-library-move-check-0.1.0.crate` is 43 KB.
+- Clean consumer installation passed. `recipe-move-check demo --json` returned 2 source recipes, 2 destination recipes, 1 collision, 1 missing image, 3 unmapped fields, and 2 ownership reviews.
+- Live pre-repair billing reproduction on 28 August 2026: `GET https://api.sociobot.in/api/v1/products/recipe-library-move-check/checkout` returned HTTP 404 with `{"error":"enabled factory product","status":404}`. `https://sociobot.in` returns HTTP 200; the former `www` target fails certificate validation.
 
-## Privacy and deletion
+## Remaining factory action
 
-The CLI has no network client or telemetry. It reads user-selected folders and writes only the named report and inventory. Delete those files to delete all real-data output. Each CLI demo prints its temporary sandbox path for deletion.
-
-The browser demo uses only `demo:recipe-library-move-check:run`, removes it when leaving demo mode, and never reads real recipes. Paid verification stores `sb_license:recipe-library-move-check` and a dated verdict. It sends only the license token to `api.sociobot.in`.
-
-## Known gaps and next steps
-
-- Export schemas can change. Fixtures cover the documented common Mealie and Tandoor shapes, but future versions may need new field aliases.
-- Similarity is intentionally a review hint. It does not use semantic matching and can miss heavily renamed recipes.
-- The repository is package-ready but does not publish a crate or attach platform binaries. The factory owns release credentials and packaging.
-- The checkout product must be registered by the factory before launch. The site uses the slug-based production URL and has no hardcoded product ID.
-- Lighthouse was measured against the local production preview. Deployment latency may change LCP.
+The researched brief specifies a one-time paid option. Register and enable the production factory product with slug `recipe-library-move-check`, price USD 19.00, and return URL `https://recipe-library-move-check.sociobot.in/?license=<token>`. Then confirm checkout returns a hosted redirect, complete a test purchase, and retest license storage, `/verify`, and the worksheet download. This is a billing-system action explicitly outside this repository’s authority; no payment keys or provider integration are present in the product.

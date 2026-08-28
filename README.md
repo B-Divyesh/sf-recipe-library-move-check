@@ -2,7 +2,7 @@
 
 Check a recipe move before you import the family library.
 
-Recipe Library Move Check is a local command-line preflight for households moving between Mealie and Tandoor. It inventories recipes, hashes available images, finds likely duplicates, lists fields that will not map cleanly, and writes a review checklist. It never uploads recipe data.
+Recipe Library Move Check is a command-line preflight for households moving between Mealie and Tandoor. It inventories recipes, hashes available images within the selected export folders, finds likely duplicates, lists fields that will not map cleanly, and writes a review checklist.
 
 ## Try the sample
 
@@ -24,7 +24,7 @@ cargo run -- check \
   --inventory neutral-inventory.json
 ```
 
-The source is the library you plan to move. The destination is the existing library you want to protect. Folder paths may contain nested recipe JSON files and images. The checker reads data but never changes either export.
+The source is the library you plan to move. The destination is the existing library you want to protect. Folder paths may contain nested recipe JSON files and images. The checker reads the folders you select and writes only the report and inventory paths you name. It does not change either export.
 
 For scripts, print the full result as JSON:
 
@@ -69,7 +69,7 @@ npm run build
 
 ## Privacy and deletion
 
-Recipe files stay on your computer. The CLI makes only the report and inventory paths you request. Delete those files, or delete the temporary directory printed by `demo`, to remove its output. The optional paid planning pack verifies only its license token with Sociobot; see the site’s Privacy and Terms pages.
+The CLI reads selected export folders and writes only the report and inventory paths you request. Delete those files, or delete the temporary directory printed by `demo`, to remove its output. The optional paid planning pack verifies only its license token with Sociobot; see the site’s Privacy and Terms pages.
 
 ## Limits
 

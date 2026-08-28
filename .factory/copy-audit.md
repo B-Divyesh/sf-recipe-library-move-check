@@ -9,8 +9,8 @@ Audited 28 August 2026. Counts treat hyphenated terms and file names as one word
 | For households moving between Mealie and Tandoor who need a safe plan for the family library. | 15 | pass |
 | Try it with sample data | 5 | pass |
 | See a completed preflight in one click. | 7 | pass |
-| Recipes stay on your computer. | 5 | pass |
-| No account is needed. | 4 | pass |
+| Reads the folders you select. | 5 | pass |
+| Writes a checklist and neutral JSON. | 6 | pass |
 | The CLI is free. | 4 | pass |
 | The planning pack costs $19 once. | 6 | pass |
 | Sample terminal run | 3 | pass |
@@ -35,11 +35,10 @@ Audited 28 August 2026. Counts treat hyphenated terms and file names as one word
 | Run it locally | 3 | pass |
 | Install the checker | 3 | pass |
 | Rust 1.80 or newer is required. | 6 | pass |
-| No server or account is involved. | 6 | pass |
 | Copy install command | 3 | pass |
 | Your recipes stay yours | 4 | pass |
-| The CLI reads export folders and writes only the files you name. | 11 | pass |
-| It does not connect to servers, move recipes, or copy paid content. | 11 | pass |
+| The CLI reads the folders you select and writes the report and inventory paths you name. | 16 | pass |
+| It does not move recipes or copy paid content. | 9 | pass |
 | Delete the report and inventory to remove its output. | 9 | pass |
 | Read the privacy details | 4 | pass |
 | Optional planning pack · $19 once | 6 | pass |

@@ -155,7 +155,12 @@ pub fn run_check(options: CheckOptions) -> Result<CheckResult, String> {
     let collisions = find_collisions(&source_recipes, &destination_recipes);
     let missing_images = source_recipes
         .iter()
-        .filter(|r| r.image.status == "missing" || r.image.status == "external")
+        .filter(|r| {
+            matches!(
+                r.image.status.as_str(),
+                "missing" | "external" | "outside_export"
+            )
+        })
         .count();
     let unmapped_fields = source_recipes.iter().map(|r| r.unmapped_fields.len()).sum();
     let ownership_reviews = source_recipes
@@ -271,7 +276,7 @@ fn read_export(spec: &ExportSpec) -> Result<(Vec<Recipe>, Vec<Warning>), String>
             }
         }
     }
-    recipes.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+    recipes.sort_by_key(|recipe| recipe.name.to_lowercase());
     Ok((recipes, warnings))
 }
 
@@ -522,30 +527,63 @@ fn inspect_image(
         });
     }
     let candidate = PathBuf::from(&raw);
-    let paths = if candidate.is_absolute() {
-        vec![candidate]
-    } else {
-        vec![
-            json_file.parent().unwrap_or(export_root).join(&candidate),
-            export_root.join(&candidate),
-        ]
-    };
-    let existing = paths.iter().find(|path| path.is_file());
+    // An export can contain stale or hostile paths. Hash only files that resolve
+    // inside the folder the person explicitly selected; canonical paths also
+    // prevent a symlink within that folder from escaping it.
+    if candidate.is_absolute() {
+        return Ok(restricted_image(raw));
+    }
+    let root = fs::canonicalize(export_root).map_err(|e| {
+        format!(
+            "could not resolve export folder {}: {e}",
+            export_root.display()
+        )
+    })?;
+    let paths = [
+        json_file.parent().unwrap_or(export_root).join(&candidate),
+        export_root.join(&candidate),
+    ];
+    let existing = paths.iter().find_map(|path| {
+        path.is_file()
+            .then(|| fs::canonicalize(path).ok())
+            .flatten()
+            .filter(|resolved| resolved.starts_with(&root))
+    });
     let Some(path) = existing else {
+        let declared_path = Some(raw);
+        let escapes_root = paths.iter().any(|path| {
+            path.exists()
+                && fs::canonicalize(path)
+                    .map(|resolved| !resolved.starts_with(&root))
+                    .unwrap_or(false)
+        });
         return Ok(ImageCheck {
-            declared_path: Some(raw),
-            status: "missing".into(),
+            declared_path,
+            status: if escapes_root {
+                "outside_export"
+            } else {
+                "missing"
+            }
+            .into(),
             sha256: None,
         });
     };
     let bytes =
-        fs::read(path).map_err(|e| format!("could not hash image {}: {e}", path.display()))?;
+        fs::read(&path).map_err(|e| format!("could not hash image {}: {e}", path.display()))?;
     let hash = format!("{:x}", Sha256::digest(bytes));
     Ok(ImageCheck {
         declared_path: Some(raw),
         status: "present".into(),
         sha256: Some(hash),
     })
+}
+
+fn restricted_image(raw: String) -> ImageCheck {
+    ImageCheck {
+        declared_path: Some(raw),
+        status: "outside_export".into(),
+        sha256: None,
+    }
 }
 
 fn find_collisions(source: &[Recipe], destination: &[Recipe]) -> Vec<Collision> {
@@ -657,7 +695,12 @@ fn render_report(result: &CheckResult) -> String {
     let missing: Vec<_> = result
         .source_recipes
         .iter()
-        .filter(|r| r.image.status == "missing" || r.image.status == "external")
+        .filter(|r| {
+            matches!(
+                r.image.status.as_str(),
+                "missing" | "external" | "outside_export"
+            )
+        })
         .collect();
     if missing.is_empty() {
         text.push_str("Every declared local image was found.\n\n");
@@ -855,5 +898,51 @@ mod tests {
     fn export_spec_rejects_unknown_systems() {
         let error = "paprika:./export".parse::<ExportSpec>().unwrap_err();
         assert!(error.contains("use mealie or tandoor"));
+    }
+
+    #[test]
+    fn image_paths_cannot_escape_the_selected_export_folder() {
+        let temp = tempdir().unwrap();
+        let source = temp.path().join("source");
+        let destination = temp.path().join("destination");
+        fs::create_dir(&source).unwrap();
+        fs::create_dir(&destination).unwrap();
+        let outside = temp.path().join("not-an-export-image.jpg");
+        fs::write(&outside, b"private image bytes").unwrap();
+        fs::write(
+            source.join("recipe.json"),
+            format!(
+                r#"{{"name":"Absolute probe","image":"{}"}}"#,
+                outside.display()
+            ),
+        )
+        .unwrap();
+        fs::write(
+            source.join("traversal.json"),
+            r#"{"name":"Traversal probe","image":"../not-an-export-image.jpg"}"#,
+        )
+        .unwrap();
+        let result = run_check(CheckOptions {
+            source: ExportSpec {
+                system: RecipeSystem::Mealie,
+                folder: source,
+            },
+            destination: ExportSpec {
+                system: RecipeSystem::Tandoor,
+                folder: destination,
+            },
+            report: temp.path().join("report.md"),
+            inventory: temp.path().join("inventory.json"),
+        })
+        .unwrap();
+        assert_eq!(result.summary.missing_images, 2);
+        assert!(result
+            .source_recipes
+            .iter()
+            .all(|recipe| recipe.image.status == "outside_export"));
+        assert!(result
+            .source_recipes
+            .iter()
+            .all(|recipe| recipe.image.sha256.is_none()));
     }
 }

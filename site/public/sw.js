@@ -1,5 +1,5 @@
-const CACHE = "recipe-move-check-v4";
-const SHELL = ["/", "/demo", "/privacy", "/terms", "/notebook-migration.webp", "/favicon.svg"];
+const CACHE = "recipe-move-check-v5";
+const SHELL = ["/", "/demo", "/privacy", "/terms", "/notebook-migration.98e3f6.webp", "/favicon.4bc1a9.svg"];
 self.addEventListener("install", event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting())));
 self.addEventListener("activate", event => event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key)))).then(() => self.clients.claim())));
 self.addEventListener("fetch", event => {

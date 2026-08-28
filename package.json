@@ -9,12 +9,15 @@
     "build:cli": "cargo build --release",
     "build": "npm run build:cli && npm run build:site",
     "preview": "vite preview --outDir dist/site",
-    "test": "cargo test && npm run build:site && playwright test",
+    "lint": "cargo fmt --check && cargo clippy --all-targets -- -D warnings",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run lint && npm run typecheck && cargo test && npm run build:site && playwright test",
     "test:browser": "playwright test"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.10.2",
     "@playwright/test": "1.58.2",
+    "@types/node": "22.16.0",
     "typescript": "5.9.2",
     "vite": "7.3.6"
   }
