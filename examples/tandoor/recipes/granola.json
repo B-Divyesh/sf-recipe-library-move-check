@@ -1,0 +1,6 @@
+{
+  "name": "Sunday Granola",
+  "ingredients": [{"amount": 3, "unit": {"name": "cups"}, "food": {"name": "oats"}}],
+  "steps": [{"instruction": "Bake until crisp."}],
+  "owner": {"name": "Sam"}
+}

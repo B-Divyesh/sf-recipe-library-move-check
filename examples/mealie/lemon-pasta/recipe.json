@@ -1,0 +1,10 @@
+{
+  "name": "Lemon Pasta",
+  "recipeIngredient": ["250 g spaghetti", "1 lemon", "2 tbsp olive oil"],
+  "recipeInstructions": [{"text": "Boil pasta."}, {"text": "Toss with lemon and oil."}],
+  "tags": ["weeknight", "family"],
+  "recipeYield": "4",
+  "image": "photo.jpg",
+  "household": {"name": "Rivera family"},
+  "rating": 5
+}

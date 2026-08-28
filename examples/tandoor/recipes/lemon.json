@@ -1,0 +1,11 @@
+{
+  "name": "Lemon Pasta",
+  "ingredients": [
+    {"amount": 250, "unit": {"name": "g"}, "food": {"name": "spaghetti"}},
+    {"amount": 1, "food": {"name": "lemon"}},
+    {"amount": 2, "unit": {"name": "tbsp"}, "food": {"name": "olive oil"}}
+  ],
+  "steps": [{"instruction": "Boil pasta, then toss with lemon and oil."}],
+  "image": "lemon.jpg",
+  "owner": {"name": "Sam"}
+}
