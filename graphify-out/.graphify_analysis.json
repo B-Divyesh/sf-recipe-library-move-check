@@ -180,13 +180,13 @@
       "degree": 11
     },
     {
-      "id": "src_lib_recipe",
-      "label": "Recipe",
+      "id": "src_lib_read_export",
+      "label": "read_export()",
       "degree": 10
     },
     {
-      "id": "src_lib_read_export",
-      "label": "read_export()",
+      "id": "src_lib_recipe",
+      "label": "Recipe",
       "degree": 10
     },
     {
@@ -205,8 +205,8 @@
       "degree": 9
     },
     {
-      "id": "package_scripts",
-      "label": "scripts",
+      "id": "site_src_main_homepage",
+      "label": "homePage()",
       "degree": 8
     }
   ],

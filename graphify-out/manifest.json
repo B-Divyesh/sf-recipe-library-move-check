@@ -1,97 +1,97 @@
 {
   ".factory/brief.json": {
-    "mtime": 1787937756.7837775,
-    "seen": 1787937757.8694992,
+    "mtime": 1787939678.131453,
+    "seen": 1787939678.8812618,
     "ast_hash": "459ae139ceb8f48558b2b6f52dccc78d",
     "semantic_hash": "459ae139ceb8f48558b2b6f52dccc78d"
   },
   ".factory/claims.json": {
-    "mtime": 1787937756.7837775,
-    "seen": 1787937757.8695033,
+    "mtime": 1787939678.131453,
+    "seen": 1787939678.8812656,
     "ast_hash": "64b05af9703d0cf20873d2a7b84b460d",
     "semantic_hash": "64b05af9703d0cf20873d2a7b84b460d"
   },
   "Cargo.toml": {
-    "mtime": 1787937756.7837775,
-    "seen": 1787937757.8695047,
+    "mtime": 1787939678.135453,
+    "seen": 1787939678.8812678,
     "ast_hash": "d2d6ce4abf2bff40cfa2a215fa1bac35",
     "semantic_hash": "d2d6ce4abf2bff40cfa2a215fa1bac35"
   },
   "examples/mealie/lemon-pasta/recipe.json": {
-    "mtime": 1787937756.7837775,
-    "seen": 1787937757.8695061,
+    "mtime": 1787939678.135453,
+    "seen": 1787939678.8812692,
     "ast_hash": "f653ca5d7a92c593e9b3badc1fca14f9",
     "semantic_hash": "f653ca5d7a92c593e9b3badc1fca14f9"
   },
   "examples/mealie/lentil-soup/recipe.json": {
-    "mtime": 1787937756.7837775,
-    "seen": 1787937757.869507,
+    "mtime": 1787939678.135453,
+    "seen": 1787939678.8812702,
     "ast_hash": "e92fd554f4a98b28193ea048d6609da9",
     "semantic_hash": "e92fd554f4a98b28193ea048d6609da9"
   },
   "examples/tandoor/recipes/granola.json": {
-    "mtime": 1787937756.7837775,
-    "seen": 1787937757.8695083,
+    "mtime": 1787939678.135453,
+    "seen": 1787939678.8812716,
     "ast_hash": "6c1f70362c094015d00d619632893da4",
     "semantic_hash": "6c1f70362c094015d00d619632893da4"
   },
   "examples/tandoor/recipes/lemon.json": {
-    "mtime": 1787937756.7837775,
-    "seen": 1787937757.8695095,
+    "mtime": 1787939678.135453,
+    "seen": 1787939678.8812728,
     "ast_hash": "9ae4955977740208f02e2fdbbd0f0c1f",
     "semantic_hash": "9ae4955977740208f02e2fdbbd0f0c1f"
   },
   "package.json": {
-    "mtime": 1787937756.7837775,
-    "seen": 1787937757.8695104,
+    "mtime": 1787939678.135453,
+    "seen": 1787939678.8812737,
     "ast_hash": "e6e45598acec7ab738b9425066d358c9",
     "semantic_hash": "e6e45598acec7ab738b9425066d358c9"
   },
   "playwright.config.ts": {
-    "mtime": 1787937756.7837775,
-    "seen": 1787937757.8695114,
+    "mtime": 1787939678.135453,
+    "seen": 1787939678.8812752,
     "ast_hash": "16a5e87c7e114614c889c4d4ec3a0dc8",
     "semantic_hash": "16a5e87c7e114614c889c4d4ec3a0dc8"
   },
   "scripts/copy-404.mjs": {
-    "mtime": 1787937756.7837775,
-    "seen": 1787937757.8695126,
+    "mtime": 1787939678.135453,
+    "seen": 1787939678.8812761,
     "ast_hash": "684a74e7a297f686bb4e85021b9b0a7c",
     "semantic_hash": "684a74e7a297f686bb4e85021b9b0a7c"
   },
   "site/public/staticwebapp.config.json": {
-    "mtime": 1787937756.7917776,
-    "seen": 1787937757.8695138,
+    "mtime": 1787939678.135453,
+    "seen": 1787939678.8812773,
     "ast_hash": "49371edf24b329319ef598f7a27223cf",
     "semantic_hash": "49371edf24b329319ef598f7a27223cf"
   },
   "site/public/sw.js": {
-    "mtime": 1787937756.7917776,
-    "seen": 1787937757.8695152,
+    "mtime": 1787939678.135453,
+    "seen": 1787939678.8812788,
     "ast_hash": "9dc88c57719041d61d1e4f5bb6eaeb32",
     "semantic_hash": "9dc88c57719041d61d1e4f5bb6eaeb32"
   },
   "site/src/main.ts": {
-    "mtime": 1787937756.7917776,
-    "seen": 1787937757.8695161,
+    "mtime": 1787939678.135453,
+    "seen": 1787939678.8812797,
     "ast_hash": "f9862d283bf2f99e02c8416339deeb58",
     "semantic_hash": "f9862d283bf2f99e02c8416339deeb58"
   },
   "src/lib.rs": {
-    "mtime": 1787937756.7917776,
-    "seen": 1787937757.869517,
+    "mtime": 1787939678.135453,
+    "seen": 1787939678.8812807,
     "ast_hash": "73c584783b7a0be9bd2da072d2de1fcd",
     "semantic_hash": "73c584783b7a0be9bd2da072d2de1fcd"
   },
   "src/main.rs": {
-    "mtime": 1787937756.7917776,
-    "seen": 1787937757.8695178,
+    "mtime": 1787939678.135453,
+    "seen": 1787939678.8812819,
     "ast_hash": "7b229853a8cdc492e992af04e533ff88",
     "semantic_hash": "7b229853a8cdc492e992af04e533ff88"
   },
   "tests/site.spec.ts": {
-    "mtime": 1787937756.7917776,
-    "seen": 1787937757.8695188,
+    "mtime": 1787939678.135453,
+    "seen": 1787939678.8812826,
     "ast_hash": "be43e30ca6b5f6a2255195e568439e83",
     "semantic_hash": "be43e30ca6b5f6a2255195e568439e83"
   }
