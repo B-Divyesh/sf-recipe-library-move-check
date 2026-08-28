@@ -2,7 +2,7 @@
 
 ## Status
 
-Repair commit: recorded in git after this handoff update. The Rust CLI, static product site, claims contract, and deployment configuration are buildable and verified locally. The one remaining release dependency is Sociobot production billing registration for `recipe-library-move-check`; the live checkout endpoint still returns its documented 404 and cannot be enabled from this repository.
+Repair commit: `f581b03` (`fix: repair verifier release findings`), pushed to `main` and deployed on 28 August 2026. The Rust CLI, static product site, claims contract, and deployment configuration are buildable and verified locally and live. The one remaining release dependency is Sociobot production billing registration for `recipe-library-move-check`; the live checkout endpoint still returns its documented 404 and cannot be enabled from this repository.
 
 ## Repairs made
 
@@ -41,7 +41,10 @@ cargo install --path . --root /tmp/recipe-move-check-consumer
 - `npm run build`: passed. Latest site bundle: 15.82 KB JavaScript raw / 5.75 KB gzip and 12.76 KB CSS raw / 3.76 KB gzip.
 - `cargo package --allow-dirty --no-verify`: passed; `target/package/recipe-library-move-check-0.1.0.crate` is 43 KB.
 - Clean consumer installation passed. `recipe-move-check demo --json` returned 2 source recipes, 2 destination recipes, 1 collision, 1 missing image, 3 unmapped fields, and 2 ownership reviews.
-- Live pre-repair billing reproduction on 28 August 2026: `GET https://api.sociobot.in/api/v1/products/recipe-library-move-check/checkout` returned HTTP 404 with `{"error":"enabled factory product","status":404}`. `https://sociobot.in` returns HTTP 200; the former `www` target fails certificate validation.
+- Deployment: Static Web Apps deployment `831a3d48-acb8-4b16-b21c-f034fe8add15` succeeded to `https://recipe-library-move-check.sociobot.in`.
+- Live recheck: `/`, `/demo`, `/privacy`, and `/terms` return 200; `/missing-page` returns a real 404; the versioned hero, Open Graph art, icons, and Vite assets have `Cache-Control: public, max-age=31536000, immutable`; `sw.js` has `no-cache`; `robots.txt` and `sitemap.xml` have a one-hour cache.
+- Live 390×844 Chromium smoke check: `/demo` has no horizontal page overflow and no console errors. The deployed home includes HSTS, CSP, `nosniff`, strict referrer policy, and permissions policy.
+- Live billing recheck on 28 August 2026: `GET https://api.sociobot.in/api/v1/products/recipe-library-move-check/checkout` still returns HTTP 404 with `{"error":"enabled factory product","status":404}`. `https://sociobot.in` returns HTTP 200; the former `www` target fails certificate validation.
 
 ## Remaining factory action
 
