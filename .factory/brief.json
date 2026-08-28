@@ -1,0 +1,12 @@
+{
+  "slug": "recipe-library-move-check",
+  "title": "Recipe Library Move Check",
+  "summary": "Check a recipe move before you import the family library.",
+  "artifact_class": "cli",
+  "user": "A household switching between self-hosted recipe apps who needs to know what will be duplicated, lost, or unshareable before importing the family library.",
+  "smallest_useful_product": "A local CLI that reads Mealie and Tandoor export folders, builds a neutral inventory, reports collisions and unmapped fields, and writes a reviewable migration checklist.",
+  "success_measure": "For supported exports, 90% of recipe collisions and unmapped fields are identified before the destination import.",
+  "monetization": "one-time",
+  "constraints": ["Run locally with user-exported data only.", "Do not transfer account credentials.", "Image hashes are metadata, not a license to redistribute content.", "Support explicit data deletion."],
+  "non_goals": ["Syncing live servers", "Managing accounts", "Copying paid content", "Acting as a recipe service"]
+}
