@@ -1,5 +1,19 @@
 # Handoff
 
+## Independent verification status — FAIL (28 August 2026)
+
+Candidate `bdbb3a0f2182f2e3c64787a9e2733ed965679114` at `https://recipe-library-move-check.sociobot.in` **must not be released**. The full independent report is in `.factory/verification-1.md`.
+
+Release blockers confirmed from fresh live evidence:
+
+- The `$19` planning-pack checkout endpoint returns HTTP 404 (`{"error":"enabled factory product","status":404}`), so the advertised paid flow cannot start.
+- The core `/demo` view overflows horizontally at the required 390px viewport (482px document width).
+- Several visitor-reliant privacy/local-only claims are absent from `.factory/claims.json`, which is a claims-contract failure.
+
+Additional findings: absolute or traversal-like image paths can be read outside selected export folders; missing routes return HTTP 200; the `www.sociobot.in` footer link has invalid TLS; static assets cache for only 30 seconds; and `cargo clippy --all-targets -- -D warnings` fails.
+
+What did pass: all five declared claim commands, `npm test` (12 browser + Rust tests), the production build, package creation, clean consumer CLI install/demo, byte-identical live deployment, desktop axe serious/critical scan, keyboard flow, reduced motion, demo local-only requests, and API rate limiting (429 at request 31, Retry-After 3).
+
 ## What shipped
 
 - A Rust 0.1.0 single-binary CLI named `recipe-move-check`.
