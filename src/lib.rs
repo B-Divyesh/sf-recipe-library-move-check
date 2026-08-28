@@ -147,10 +147,10 @@ pub fn run_check(options: CheckOptions) -> Result<CheckResult, String> {
         ));
     }
     if destination_recipes.is_empty() {
-        return Err(format!(
-            "no recipes were found in {}. Check the folder and export type",
-            options.destination.folder.display()
-        ));
+        warnings.push(Warning {
+            file: options.destination.folder.display().to_string(),
+            message: "the destination has no recipes; collision results are empty".into(),
+        });
     }
     let collisions = find_collisions(&source_recipes, &destination_recipes);
     let missing_images = source_recipes
@@ -255,6 +255,12 @@ fn read_export(spec: &ExportSpec) -> Result<(Vec<Recipe>, Vec<Warning>), String>
             }
         };
         let candidates: Vec<&Value> = if let Some(items) = value.as_array() {
+            items.iter().collect()
+        } else if let Some(items) = value
+            .get("recipes")
+            .or_else(|| value.get("items"))
+            .and_then(Value::as_array)
+        {
             items.iter().collect()
         } else {
             vec![&value]
@@ -815,6 +821,34 @@ mod tests {
         .unwrap_err();
         assert!(error.contains("no recipes were found"));
         assert!(error.contains("Check the folder"));
+    }
+
+    #[test]
+    fn empty_destination_produces_a_useful_zero_collision_report() {
+        let temp = tempdir().unwrap();
+        let source = temp.path().join("source");
+        let destination = temp.path().join("destination");
+        fs::create_dir(&source).unwrap();
+        fs::create_dir(&destination).unwrap();
+        fs::write(source.join("recipe.json"), r#"{"name":"Toast"}"#).unwrap();
+        let result = run_check(CheckOptions {
+            source: ExportSpec {
+                system: RecipeSystem::Mealie,
+                folder: source,
+            },
+            destination: ExportSpec {
+                system: RecipeSystem::Tandoor,
+                folder: destination,
+            },
+            report: temp.path().join("report.md"),
+            inventory: temp.path().join("inventory.json"),
+        })
+        .unwrap();
+        assert_eq!(result.summary.destination_recipes, 0);
+        assert_eq!(result.summary.collisions, 0);
+        assert!(result.warnings[0]
+            .message
+            .contains("destination has no recipes"));
     }
 
     #[test]
