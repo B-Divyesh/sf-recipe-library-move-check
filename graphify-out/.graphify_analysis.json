@@ -240,13 +240,13 @@
       "degree": 10
     },
     {
-      "id": "src_lib_recipesystem",
-      "label": "RecipeSystem",
+      "id": "site_src_main_render",
+      "label": "render()",
       "degree": 9
     },
     {
-      "id": "src_lib_run_demo",
-      "label": "run_demo()",
+      "id": "src_lib_recipesystem",
+      "label": "RecipeSystem",
       "degree": 9
     }
   ],
