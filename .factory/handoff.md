@@ -4,7 +4,7 @@
 
 All 21 findings in .factory/review-1.md are resolved. The static site and Rust CLI retain the handwritten migration-notebook identity. Production is deployed at https://recipe-library-move-check.sociobot.in.
 
-The repair commit is 597c995e8cef598599f8a50dcaf89f24dd374fab. It was pushed to origin/main before deployment.
+The main repair commit is 597c995e8cef598599f8a50dcaf89f24dd374fab. The final supported-field fixture commit is c5cd7c0095907aaaa82ca20cfac22757ad85aebb. Both were pushed before the final deployment.
 
 ## What changed
 
@@ -23,15 +23,16 @@ The finding-by-finding map is in .factory/polish-1.md.
 
 ## Clean-clone evidence
 
-Clean clone: commit 597c995 in /tmp/recipe-move-clean-KE5BWt/repo.
+Final clean clone: commit c5cd7c0 in /tmp/recipe-move-final-P1DCsA/repo.
 
 - npm ci: pass; 0 vulnerabilities.
 - Every one of the 14 exact commands in .factory/claims.json: pass when run separately.
 - npm test: pass; strict Rust format/Clippy, TypeScript, 6 Rust tests, production build, and 32 Chromium tests.
 - npm run build: pass; release CLI and dist/site produced.
-- cargo package --no-verify: pass; 17 files, 52.9 KiB unpacked, 15.2 KiB compressed.
+- cargo package --no-verify: pass; 17 files, 53.0 KiB unpacked, 15.3 KiB compressed.
 - Fresh cargo install --path . --locked: pass.
 - Installed recipe-move-check demo --json: 2 moving recipes, 2 existing recipes, 1 possible duplicate, 1 missing image, 3 fields, and 2 ownership reviews.
+- Installed JSON inventory preserved the fixture's Tandoor keywords and servings as tags [weeknight, family] and servings 4.
 - Initial JavaScript: 15.99 KB raw / 5.77 KB gzip.
 - CSS: 13.21 KB raw / 3.84 KB gzip.
 
@@ -71,7 +72,7 @@ Deployment command:
 
     /opt/fleet/lib/deploy-static.sh recipe-library-move-check dist/site
 
-Azure Static Web Apps deployment b73f8b11-73fc-44c1-9730-6daa735f327a succeeded in centralus.
+Final Azure Static Web Apps deployment e7999b7d-2522-4a0f-9c7e-823e8ca4a42d succeeded in centralus.
 
 - GET /, /?demo=1, /demo, /privacy, /terms, and /terminal-recording.4a32d1.svg: 200.
 - GET /missing-page: 404 with the styled recovery page.
