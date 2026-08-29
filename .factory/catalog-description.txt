@@ -1,1 +1,1 @@
-Check a Mealie or Tandoor recipe move for duplicates, missing images, and fields to review before importing.
+Check Mealie and Tandoor recipe exports for issues before importing a family library.

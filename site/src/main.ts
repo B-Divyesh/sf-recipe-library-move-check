@@ -33,14 +33,14 @@ function facts(): string {
   return `<ul class="facts" aria-label="Product facts">
     <li><span aria-hidden="true">⌂</span> Runs locally on the folders you select.</li>
     <li><span aria-hidden="true">×</span> Writes a checklist and a JSON inventory you can review before importing.</li>
-    <li><span aria-hidden="true">$</span> The CLI is free. The planning pack costs $19 once.</li>
+    <li><span aria-hidden="true">$</span> The command-line checker is free. The planning pack costs $19 once.</li>
   </ul>`;
 }
 
 function terminal(compact = false): string {
   return `<figure class="terminal ${compact ? "terminal-compact" : ""}" aria-labelledby="terminal-title">
-    <div class="terminal-bar"><span aria-hidden="true">● ● ●</span><h2 id="terminal-title">Recorded CLI sample</h2><button class="terminal-replay" type="button">Replay sample run</button></div>
-    <img class="terminal-recording" src="/terminal-recording.4a32d1.svg" width="960" height="430" alt="Recording of the real CLI finding one possible duplicate, one missing image, and three fields to review.">
+    <div class="terminal-bar"><span aria-hidden="true">● ● ●</span><h2 id="terminal-title">Recorded command-line sample</h2><button class="terminal-replay" type="button">Replay sample run</button></div>
+    <img class="terminal-recording" src="/terminal-recording.4a32d1.svg" width="960" height="430" alt="Recording of the real command-line checker finding one possible duplicate, one missing image, and three fields to review.">
     <figcaption>Recorded from <code>recipe-move-check demo --json</code> using the bundled sample.</figcaption>
   </figure>`;
 }
@@ -61,7 +61,7 @@ function resultLedger(): string {
 
 function paidSection(): string {
   return `<section class="paid sheet shell" aria-labelledby="paid-title">
-    <div><p class="eyebrow">Optional planning pack · $19 once</p><h2 id="paid-title">Optional family planning pack</h2><p>Download a printable ownership worksheet and move-day notes. The CLI, checklist, and JSON inventory remain free.</p></div>
+    <div><p class="eyebrow">Optional planning pack · $19 once</p><h2 id="paid-title">Optional family planning pack</h2><p>Download a printable ownership worksheet and move-day notes. The checker, checklist, and JSON inventory remain free.</p></div>
     <div class="paid-actions">
       <a class="button button-dark" href="${API}/products/${SLUG}/checkout">Buy the planning pack</a>
       <button class="text-button" id="restore-toggle" type="button">Enter license token</button>
@@ -86,8 +86,8 @@ function homePage(): string {
       <li><span>02</span><div><h3>Run one local command</h3><p>Point the checker at the moving and existing folders.</p></div></li>
       <li><span>03</span><div><h3>Review the written checklist</h3><p>Review possible duplicates, images, fields, owners, and family access.</p></div></li>
     </ol></section>
-    <section id="install" class="install dark-sheet" aria-labelledby="install-title"><div class="shell install-grid"><div><p class="eyebrow">Run it locally</p><h2 id="install-title">Install the checker</h2><p>Install the free CLI with Cargo.</p></div><div class="code-block"><button type="button" class="copy-command" data-copy="cargo install --git https://github.com/B-Divyesh/sf-recipe-library-move-check">Copy install command</button><code>cargo install --git https://github.com/<wbr>B-Divyesh/<wbr>sf-recipe-library-move-check</code></div></div></section>
-    <section class="limits shell" aria-labelledby="limits-title"><div><h2 id="limits-title">What the checker reads and writes</h2></div><div><p>The CLI reads the folders you select. It writes the checklist and JSON inventory paths you name.</p><p>It does not change either export.</p><p>Delete the checklist and inventory to remove its output.</p><a href="/privacy" data-link>Read the privacy details</a></div></section>
+    <section id="install" class="install dark-sheet" aria-labelledby="install-title"><div class="shell install-grid"><div><p class="eyebrow">Run it locally</p><h2 id="install-title">Install the checker</h2><p>Install the free command-line checker with Cargo.</p></div><div class="code-block"><button type="button" class="copy-command" data-copy="cargo install --git https://github.com/B-Divyesh/sf-recipe-library-move-check">Copy install command</button><code>cargo install --git https://github.com/<wbr>B-Divyesh/<wbr>sf-recipe-library-move-check</code></div></div></section>
+    <section class="limits shell" aria-labelledby="limits-title"><div><h2 id="limits-title">What the checker reads and writes</h2></div><div><p>The command-line checker reads the folders you select. It writes the checklist and JSON inventory paths you name.</p><p>It does not change either export.</p><p>Delete the checklist and inventory to remove its output.</p><a href="/privacy" data-link>Read the privacy details</a></div></section>
     ${paidSection()}
   </main>${footer()}`;
 }
@@ -103,12 +103,12 @@ function demoPage(): string {
 function policyPage(kind: "privacy" | "terms"): string {
   const privacy = kind === "privacy";
   return `${header()}<main id="main" class="policy shell"><p class="eyebrow">Last updated 29 August 2026</p><h1 tabindex="-1">${privacy ? "Privacy in plain words" : "Terms for using this checker"}</h1>
-    ${privacy ? `<section><h2>The CLI uses selected folders</h2><p>The checker reads the export folders you choose. It writes the checklist and inventory paths you choose.</p></section><section><h2>The sample does not use your recipes</h2><p>The site demo uses fixed fictional recipes. Demo state uses a separate <code>demo:</code> browser key. Resetting or leaving the demo removes that key.</p></section><section><h2>License checks</h2><p>If you buy the optional planning pack, the site stores your license token and a dated verdict in this browser.</p><p>It sends only that token to Sociobot for verification. Delete the site’s local storage to remove both values.</p></section><section><h2>Site logs</h2><p>The host may keep standard security logs.</p></section>` : `<section><h2>Use it as a check</h2><p>Similarity scores are review hints. They do not prove that two recipes are the same. Keep backups and test a small import first.</p></section><section><h2>Your content remains yours</h2><p>You are responsible for the recipes and images you inspect or move. An image hash is metadata. It does not grant a right to copy an image.</p></section><section><h2>The free checker</h2><p>The CLI, Markdown checklist, and JSON inventory are provided under the MIT License. They come without a warranty.</p></section><section><h2>The $19 planning pack</h2><p>The planning pack is a one-time purchase.</p><p>Dodo Payments is the online reseller and merchant of record. Use the support link in your Dodo receipt for order questions and returns.</p><p>The free checker remains available.</p></section>`}
+    ${privacy ? `<section><h2>The command-line checker uses selected folders</h2><p>The checker reads the export folders you choose. It writes the checklist and inventory paths you choose.</p></section><section><h2>The sample does not use your recipes</h2><p>The site demo uses fixed fictional recipes. Demo state uses a separate <code>demo:</code> browser key. Resetting or leaving the demo removes that key.</p></section><section><h2>License checks</h2><p>If you buy the optional planning pack, the site stores your license token and a dated verdict in this browser.</p><p>It sends only that token to Sociobot for verification. Delete the site’s local storage to remove both values.</p></section><section><h2>Site logs</h2><p>The host may keep standard security logs.</p></section>` : `<section><h2>Use it as a check</h2><p>Similarity scores are review hints. They do not prove that two recipes are the same. Keep backups and test a small import first.</p></section><section><h2>Your content remains yours</h2><p>You are responsible for the recipes and images you inspect or move. An image hash is metadata. It does not grant a right to copy an image.</p></section><section><h2>The free checker</h2><p>The checker, Markdown checklist, and JSON inventory are provided under the MIT License. They come without a warranty.</p></section><section><h2>The $19 planning pack</h2><p>The planning pack is a one-time purchase.</p><p>Dodo Payments is the online reseller and merchant of record. Use the support link in your Dodo receipt for order questions and returns.</p><p>The free checker remains available.</p></section>`}
   </main>${footer()}`;
 }
 
 function notFoundPage(): string {
-  return `${header()}<main id="main" class="not-found shell"><div class="lost-mark" aria-hidden="true">404</div><p class="eyebrow">Notebook page missing</p><h1 tabindex="-1">This page is not in the checklist</h1><p>The address may be old or mistyped.</p><a class="button" href="/" data-link>Return to the checker</a></main>${footer()}`;
+  return `${header()}<main id="main" class="not-found shell"><div class="lost-mark" aria-hidden="true">404</div><p class="eyebrow">Error 404</p><h1 tabindex="-1">Page not found</h1><p>The address may be old or mistyped.</p><a class="button" href="/" data-link>Return to the checker</a></main>${footer()}`;
 }
 
 function pageFor(path: string): Page {
@@ -126,7 +126,7 @@ function metadata(page: Page): void {
     demo: ["Demo — Recipe Library Move Check", "Review a sample Mealie to Tandoor move with a possible duplicate and a missing-image finding."],
     privacy: ["Privacy — Recipe Library Move Check", "See what the local checker reads, what it writes, and how optional license verification works."],
     terms: ["Terms — Recipe Library Move Check", "Terms for the free recipe move checker and optional household planning pack."],
-    "not-found": ["Page not found — Recipe Move Check", "Return to Recipe Library Move Check."],
+    "not-found": ["Page not found — Recipe Library Move Check", "Return to Recipe Library Move Check."],
   };
   const [title, description] = meta[page];
   const canonicalPath = page === "demo" ? "/demo" : page === "not-found" ? "/404" : location.pathname;

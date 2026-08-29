@@ -100,6 +100,15 @@ test("@claim:demo-privacy isolates, resets, and discards the browser sample", as
   expect(outgoing).toEqual([]);
 });
 
+test("@claim:one-click-demo opens the isolated completed sample from the first screen", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("link", { name: "Try it with sample data" }).click();
+  await expect(page).toHaveURL(/\/?\?demo=1$/);
+  await expect(page.locator(".demo-banner")).toContainText("Demo — sample data, nothing is saved");
+  await expect(page.getByRole("heading", { name: "Review a recipe move with sample data" })).toBeVisible();
+  await expect(page.getByLabel("Sample result totals")).toContainText("1possible duplicate");
+});
+
 test("@claim:cli-capabilities inventories, hashes, compares, and reports the sample", async ({ page }) => {
   const result = JSON.parse(runCargo(["demo", "--json"])) as CliResult;
   expect(result.summary).toEqual({
@@ -500,7 +509,7 @@ test("@claim:planning-pack verifies $19 access and downloads the stated contents
     body: JSON.stringify({ valid: true, reason: "ok" }),
   }));
   await page.goto("/?license=test-license");
-  await expect(page.getByText("The CLI is free. The planning pack costs $19 once.")).toBeVisible();
+  await expect(page.getByText("The command-line checker is free. The planning pack costs $19 once.")).toBeVisible();
   await expect(page.getByText("Optional planning pack · $19 once")).toBeVisible();
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Download planning pack" }).click();
@@ -553,6 +562,36 @@ test("@claim:crate-package contains only consumer CLI material", async () => {
   }
 });
 
+test("@claim:install-command installs the exact published Cargo command into a fresh root", async ({ page }) => {
+  test.setTimeout(180_000);
+  await page.goto("/");
+  const command = "cargo install --git https://github.com/B-Divyesh/sf-recipe-library-move-check";
+  await expect(page.locator(".copy-command")).toHaveAttribute("data-copy", command);
+  await expect(page.getByText("Install the free command-line checker with Cargo.")).toBeVisible();
+
+  const installRoot = mkdtempSync(join(tmpdir(), "recipe-move-check-install-"));
+  try {
+    const installed = spawnSync("cargo", ["install", "--git", "https://github.com/B-Divyesh/sf-recipe-library-move-check"], {
+      cwd: process.cwd(),
+      encoding: "utf8",
+      timeout: 150_000,
+      env: { ...process.env, CARGO_INSTALL_ROOT: installRoot },
+    });
+    expect(installed.status, installed.stderr || installed.stdout).toBe(0);
+    const binary = join(installRoot, "bin", "recipe-move-check");
+    const version = spawnSync(binary, ["--version"], { encoding: "utf8" });
+    expect(version.status, version.stderr).toBe(0);
+    expect(version.stdout).toMatch(/^recipe-move-check 0\.1\.0/);
+    const demo = spawnSync(binary, ["demo", "--json"], { encoding: "utf8" });
+    expect(demo.status, demo.stderr).toBe(0);
+    const result = JSON.parse(demo.stdout) as CliResult;
+    expect(result.summary).toMatchObject({ source_recipes: 2, destination_recipes: 2, possible_duplicates: 1 });
+    removeDemo(result);
+  } finally {
+    rmSync(installRoot, { recursive: true, force: true });
+  }
+});
+
 for (const route of ["/", "/?demo=1", "/demo", "/privacy", "/terms", "/missing-page"]) {
   test(`accessibility baseline on ${route}`, async ({ page }) => {
     const errors: string[] = [];
@@ -575,7 +614,7 @@ test("real routes set titles, canonical links, and social metadata", async ({ pa
     ["/demo", "Demo — Recipe Library Move Check", "/demo"],
     ["/privacy", "Privacy — Recipe Library Move Check", "/privacy"],
     ["/terms", "Terms — Recipe Library Move Check", "/terms"],
-    ["/missing-page", "Page not found — Recipe Move Check", "/404"],
+    ["/missing-page", "Page not found — Recipe Library Move Check", "/404"],
   ];
   for (const [route, title, canonical] of routes) {
     await page.goto(route);
@@ -633,6 +672,27 @@ test("the complete first-screen message fits a 390px phone viewport", async ({ p
   const facts = page.getByLabel("Product facts");
   await expect(facts.locator("li")).toHaveCount(3);
   expect(await facts.evaluate(element => element.getBoundingClientRect().bottom)).toBeLessThanOrEqual(844);
+});
+
+test("the complete first-screen message fits a 1440px desktop viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const facts = page.getByLabel("Product facts");
+  await expect(facts.locator("li")).toHaveCount(3);
+  expect(await facts.evaluate(element => element.getBoundingClientRect().bottom)).toBeLessThanOrEqual(900);
+});
+
+test("public package copy keeps the documented plain terms", async () => {
+  const manifest = readFileSync("Cargo.toml", "utf8");
+  const changelog = readFileSync("CHANGELOG.md", "utf8");
+  const readme = readFileSync("README.md", "utf8");
+  expect(manifest).toContain('description = "Check Mealie and Tandoor recipe-library moves before importing"');
+  expect(changelog).toContain("Add a JSON inventory, possible-duplicate checks, image hashing, and Markdown checklists.");
+  const publicCopy = `${manifest}\n${changelog}\n${readme}`;
+  expect(publicCopy).not.toMatch(/\bpreflight\b/i);
+  expect(publicCopy).not.toMatch(/\bneutral inventory\b/i);
+  expect(publicCopy).toContain("possible duplicate");
+  expect(publicCopy).toContain("checklist");
 });
 
 for (const width of [320, 390]) {

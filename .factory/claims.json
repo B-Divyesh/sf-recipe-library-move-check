@@ -2,7 +2,7 @@
   {
     "id": "sample-findings",
     "claim": "The bundled sample finds one possible duplicate, one missing image, three fields to review, and two ownership reviews.",
-    "where": "landing recording, demo result ledger, CLI demo",
+    "where": "landing recording, demo result ledger, command-line demo",
     "test": "npm test -- --grep @claim:sample-findings",
     "sandbox": "fresh browser context at /?demo=1; assert every displayed count, evidence reason, missing path, and ownership reminder"
   },
@@ -14,23 +14,30 @@
     "sandbox": "fresh browser context at /?demo=1; capture every request and storage key through replay, reset, and Start for real"
   },
   {
+    "id": "one-click-demo",
+    "claim": "Try it with sample data opens the isolated completed sample in one click.",
+    "where": "landing primary action",
+    "test": "npm test -- --grep @claim:one-click-demo",
+    "sandbox": "fresh browser context at /; activate the visible sample action once and assert the demo banner and completed findings"
+  },
+  {
     "id": "cli-capabilities",
-    "claim": "The CLI inventories recipes, hashes available in-folder images, finds possible duplicates, lists fields to review, and writes a checklist.",
-    "where": "landing page, README, CLI output",
+    "claim": "The command-line checker inventories recipes, hashes available in-folder images, finds possible duplicates, lists fields to review, and writes a checklist.",
+    "where": "landing page, README, checker output",
     "test": "npm test -- --grep @claim:cli-capabilities",
-    "sandbox": "run the real bundled CLI demo; inspect its JSON inventory and Markdown checklist"
+    "sandbox": "run the real bundled command-line demo; inspect its JSON inventory and Markdown checklist"
   },
   {
     "id": "free-cli",
-    "claim": "The MIT-licensed CLI is free and runs without an account, license, or reachable network.",
+    "claim": "The MIT-licensed command-line checker is free and runs without an account, license, or reachable network.",
     "where": "landing facts, install section, terms, README",
     "test": "npm test -- --grep @claim:free-cli",
     "sandbox": "build the binary, provide unreachable proxy endpoints and no product credentials, then require both outputs"
   },
   {
     "id": "demo-is-real-cli",
-    "claim": "The CLI demo runs the same checker on the shipped sample used by the recorded web demo.",
-    "where": "recorded CLI sample, README, demo documentation",
+    "claim": "The command-line demo runs the same checker on the shipped sample used by the recorded web demo.",
+    "where": "recorded command-line sample, README, demo documentation",
     "test": "npm test -- --grep @claim:demo-is-real-cli",
     "sandbox": "compare normalized demo output with check output on examples/ and validate the SVG recording source data"
   },
@@ -51,7 +58,7 @@
   {
     "id": "safe-output-paths",
     "claim": "The checker rejects unsafe output paths and identical libraries, and never reads a JSON symlink outside a selected export.",
-    "where": "README and CLI errors",
+    "where": "README and checker errors",
     "test": "npm test -- --grep @claim:safe-output-paths",
     "sandbox": "fresh temporary exports; attempt output-path, identical-root, and out-of-root JSON-symlink counterexamples"
   },
@@ -134,9 +141,16 @@
   },
   {
     "id": "crate-package",
-    "claim": "The published crate contains only the consumer CLI, documentation, license, changelog, and shipped examples.",
+    "claim": "The published crate contains only the consumer command-line checker, documentation, license, changelog, and shipped examples.",
     "where": "README install and package",
     "test": "npm test -- --grep @claim:crate-package",
     "sandbox": "list a fresh cargo package and reject repository analysis, website, browser-test, and factory files"
+  },
+  {
+    "id": "install-command",
+    "claim": "The published Cargo command installs the checker and runs its bundled demo.",
+    "where": "landing install section",
+    "test": "npm test -- --grep @claim:install-command",
+    "sandbox": "fresh CARGO_INSTALL_ROOT; run the exact command shown on the landing page, then assert --version and the bundled demo outcome"
   }
 ]
