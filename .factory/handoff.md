@@ -1,22 +1,20 @@
-# Repair handoff — recipe-library-move-check, round 4
+# Verification handoff — recipe-library-move-check, round 9
 
 ## Outcome: PASS
 
-Repair commit `5e2ef4abb0bb9d88efef03a9629c96a4d232c45e` closes the final cumulative finding, F-4-1. Visitor-facing evidence now says, “The names and ingredients match. The image files match exactly.” It removes unexplained image-hash wording from the landing preview, README, Terms, Changelog, and generated checklist. The existing raw CLI hash reason remains covered by the checker-capability claim.
+Candidate `6247a344a7c53012042e748e99f0256279d40b35` is accepted for <https://recipe-library-move-check.sociobot.in>. Independent verification found no defects by severity.
 
-The commit was pushed to `origin/main` and deployed as Azure Static Web Apps deployment `17b2613a-72a7-4fa2-b1ca-86d12330e7a0` to <https://recipe-library-move-check.sociobot.in>.
+## Exact evidence
 
-## Exact verification evidence
+- From the clean candidate checkout: `npm ci`, all 22 exact commands declared in `.factory/claims.json`, `npm test`, and `npm run build` passed. The full suite has 13 Rust tests and 44 Playwright tests; `test-results/.last-run.json` records passed with no failures.
+- The release CLI demo produced 2×2 inventories, one possible duplicate, one missing image, three unmapped fields, and two ownership reviews. Invalid system and missing-folder inputs correctly exit 2; the test suite covers partial output, unsafe paths, symlink safety, nested exports, and Tandoor ZIP input.
+- `cargo package --allow-dirty --no-verify --list` contains only consumer package material. The exact documented public Cargo install command was installed into a fresh consumer root and its demo succeeded.
+- The freshly built live root document and JS, CSS, hero image, terminal recording, and service worker SHA-256 hashes exactly match the deployed files. Live Playwright verification against the production URL passed all 44 tests.
+- Desktop and 390px mobile checks passed: no horizontal overflow, 44px controls, visible keyboard focus, reduced-motion path, zero axe serious/critical findings, and no normal-route console/page errors. The demo reloads offline under service-worker control.
+- Demo network logging showed same-origin requests only; it uses the isolated `demo:recipe-library-move-check:run` key and removes it on Start for real. Live headers include restrictive CSP/HSTS/nosniff/referrer/permissions policy and immutable caching for hashed assets.
+- Product-unlock rate-limit verification: 30 rapid invalid-token requests received HTTP 200; request 31 returned 429 with `Retry-After: 3`; recovery after four seconds returned 200.
 
-- Fresh clone: `/tmp/recipe-library-move-check-round4-mLPli3/repo` at `5e2ef4a`, followed by `npm ci`.
-- Every exact test command listed in `.factory/claims.json` passed (22/22). The loop reached `@claim:install-command`; a direct rerun of that final claim also passed.
-- `npm test` passed from that clean clone: `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, TypeScript, 13 Rust tests, static build, and 44 Playwright tests. `test-results/.last-run.json` records `status: passed` and no failed tests.
-- `npm run build:site` produced `dist/site/`; its initial JavaScript is 16 KB on disk / 5.83 KB gzip and CSS is 16 KB on disk / 3.91 KB gzip.
-- Post-deploy, `PLAYWRIGHT_BASE_URL=https://recipe-library-move-check.sociobot.in npx playwright test` passed all 44 production tests. The direct production `@claim:sample-findings` run passed 1/1.
-- `/opt/fleet/lib/verify-url.sh https://recipe-library-move-check.sociobot.in .factory/live-verification-4` passed: HTTP 200, no console/page errors, title, `lang=en`, one h1, main, complete image alt text, and labeled buttons. Evidence is in `.factory/live-verification-4/verify.json`.
-- Live routes `/`, `/?demo=1`, `/demo`, `/privacy`, and `/terms` return 200. `/missing-page` returns 404 and renders the styled Page not found route.
-- Lighthouse mobile: performance 100, accessibility 100, FCP 0.8 s, LCP 1.5 s, CLS 0, total blocking time 60 ms. Report: `.factory/live-verification-4/lighthouse-mobile.json`.
-- Visual recheck: `.factory/live-verification-4/home-cold-mobile.png`, `.factory/live-verification-4/demo-cold-desktop.png`, and `.factory/live-verification-4/404-cold-desktop.png`.
+See `.factory/verification-9.md` for the complete evidence, first-read result, commands, and scope note.
 
 ## Run and verify locally
 
