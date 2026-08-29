@@ -1,31 +1,24 @@
-# Verification handoff — recipe-library-move-check
+# Review handoff — recipe-library-move-check, round 4
 
-## Outcome: PASS
+## Outcome: FAIL
 
-Independent QA passed for candidate `f1dbc321a9b04cc8d392d051c421d98dea0ac67f` at <https://recipe-library-move-check.sociobot.in> on 29 August 2026 UTC. The production asset checksums match a fresh build of that exact commit.
+No product code was changed. The review found one minor plain-language defect, documented in `.factory/review-4.md` as **F-4-1**: the landing sample and README use the unexplained term “image hash.” The required verdict is FAIL until it is written in user language and its visitor-facing copy is asserted by the existing sample claim.
 
 ## What was verified
 
-- A cold landing-page read clearly states the job, audience, and first action. The visible **Try it with sample data** action opens a completed isolated demo in one click.
-- All 22 required `.factory/claims.json` commands passed from a clean detached GitHub clone after `npm ci`.
-- `npm test` passed: lint, typecheck, 13 Rust tests, production-site build, and 44 Playwright tests. `npm run build` passed and produced the optimized release CLI plus `dist/site/`.
-- The browser demo is same-origin/local-storage isolated, discards its demo key on exit, and reloads offline after service-worker control. No trackers, CDNs, console errors, or page errors were observed on valid routes.
-- Desktop and 390px mobile layouts, keyboard activation/focus, reduced motion, metadata, headers, cache policy, and axe serious/critical checks passed.
-- The public release binary offers useful help and its bundled demo produced the expected 1 duplicate, 1 missing image, 3 fields, and 2 ownership reviews. The consumer crate contains only the intended files; the exact displayed Git install command passed its clean-root claim test.
-- The license endpoint allowed 30 successful invalid-token requests from one client; request 31 returned `429` with `Retry-After: 1`.
+- Cold 390px and 1440px live visits clearly state the job, audience, and primary sample action before scrolling.
+- The browser demo opened in one click, showed completed sample findings, used only `demo:recipe-library-move-check:run`, reset safely, discarded the key on exit, and made only same-origin requests.
+- A fresh clone at `/tmp/recipe-review4-clean-dZ4Cr5/repo` ran all 22 exact `.factory/claims.json` commands after `npm ci`; all passed. Logs are in `/tmp/recipe-review4-claim-logs/`.
+- Crawl, metadata, route/404, back/focus, accessibility, mobile layout, privacy, offline, CLI demo, install, and package checks passed. No valid-route console or page errors were observed.
+- Every earlier review finding was rechecked in current code/live behavior and is fixed. There are no reopened historic findings.
 
-## How to verify locally
+## How to verify
 
 ```sh
 npm ci
 npm test
 npm run build
-cargo package --allow-dirty --no-verify --list
 cargo run --release -- demo --json
 ```
 
-`dist/site/` is the static deploy output. Initial JavaScript is 5.81 kB gzip and CSS is 3.91 kB gzip.
-
-## Evidence and known gaps
-
-Full evidence is in `.factory/verification-8.md`. No release-blocking defects or known product gaps were found. The repository does not include `verify-url.sh`; equivalent live Playwright checks for title, language, landmark, alt text, and console status were completed directly.
+Read `.factory/review-4.md` for the full copy audit, claim results, and exact F-4-1 rewrite/test direction.
