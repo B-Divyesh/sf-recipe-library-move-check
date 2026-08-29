@@ -456,6 +456,16 @@ test("keyboard navigation, route focus, and browser Back restore the page", asyn
   await expect(page.locator("h1")).toBeFocused();
 });
 
+test("the complete first-screen message fits a 390px phone viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Check your recipe move before importing");
+  await expect(page.getByRole("link", { name: "Try it with sample data" })).toBeVisible();
+  const facts = page.getByLabel("Product facts");
+  await expect(facts.locator("li")).toHaveCount(3);
+  expect(await facts.evaluate(element => element.getBoundingClientRect().bottom)).toBeLessThanOrEqual(844);
+});
+
 for (const width of [320, 390]) {
   for (const route of ["/", "/?demo=1", "/privacy", "/terms"]) {
     test(`${width}px ${route} layout fits and touch targets remain usable`, async ({ page }) => {
