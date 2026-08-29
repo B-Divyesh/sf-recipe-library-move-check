@@ -36,10 +36,10 @@
   },
   {
     "id": "nested-export-support",
-    "claim": "The checker reads recipe JSON files and local images inside nested export folders.",
+    "claim": "The checker reads nested exports and Tandoor's default outer ZIP, including step ingredients and sibling images.",
     "where": "README",
     "test": "npm test -- --grep @claim:nested-export-support",
-    "sandbox": "check the nested shipped Mealie and Tandoor sample folders and inspect source paths and image status"
+    "sandbox": "check nested shipped exports plus a generated Tandoor outer ZIP fixture; inspect source paths, step ingredients, and sibling image status"
   },
   {
     "id": "cli-local-only",
@@ -50,10 +50,10 @@
   },
   {
     "id": "safe-output-paths",
-    "claim": "The checker rejects report or inventory paths that overlap an export, an input file alias, or each other before changing either export.",
+    "claim": "The checker rejects unsafe output paths and identical libraries, and never reads a JSON symlink outside a selected export.",
     "where": "README and CLI errors",
     "test": "npm test -- --grep @claim:safe-output-paths",
-    "sandbox": "fresh temporary exports; attempt each unsafe output path and hash both exports before and after"
+    "sandbox": "fresh temporary exports; attempt output-path, identical-root, and out-of-root JSON-symlink counterexamples"
   },
   {
     "id": "exit-codes",
@@ -64,10 +64,10 @@
   },
   {
     "id": "partial-read-warnings",
-    "claim": "If a recipe JSON file cannot be read, the checker marks the checklist and inventory as partial, names the file in human output, and returns exit code 1.",
+    "claim": "If a recipe JSON file or candidate cannot be inventoried, the checker marks partial outputs, names it in human output, and returns exit code 1.",
     "where": "README and generated checklist",
     "test": "npm test -- --grep @claim:partial-read-warnings",
-    "sandbox": "one valid recipe plus malformed JSON; inspect stdout, Markdown, JSON inventory, and exit status"
+    "sandbox": "mixed and all-malformed JSON plus a valid nameless candidate; inspect stdout, Markdown, JSON inventory, and exit status"
   },
   {
     "id": "family-review-empty-state",

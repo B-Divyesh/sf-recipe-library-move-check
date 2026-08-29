@@ -26,9 +26,9 @@ cargo run -- check \
   --inventory neutral-inventory.json
 ```
 
-The source is the library you plan to move. The destination is the existing library you compare against. Recipe JSON files and images may be inside nested folders.
+The source is the library you plan to move. The destination is the existing library you compare against. Recipe JSON files and images may be inside nested folders. Tandoor's default `export_YYYY-MM-DD.zip` is supported directly: its per-recipe ZIP files are read in place, including each `recipe.json`, step ingredients, and sibling `image.*` file.
 
-The checker reads the two folders and writes only the two paths you name. It does not change either export. It rejects report or inventory paths inside either export, paths that alias an input file, and report/inventory paths that overlap each other.
+The checker reads the two folders and writes only the two paths you name. It does not change either export. It rejects the same folder for both libraries, report or inventory paths inside either export, paths that alias an input file, and report/inventory paths that overlap each other. It does not follow directory symlinks or read JSON symlinks that resolve outside the selected folder.
 
 The JSON inventory is a JSON file for scripts or another recipe tool. Print the complete result as JSON:
 
@@ -39,12 +39,12 @@ cargo run -- check \
   --json
 ```
 
-Exit code `0` means the check read every recipe JSON file, even when it found review items. Exit code `1` means it wrote a marked **partial** checklist and inventory because one or more JSON files could not be read; fix the named files and run it again before importing. Invalid arguments, unsafe output paths, and unreadable folders return exit code `2`. Run `recipe-move-check --help` to see every option.
+Exit code `0` means the check inventoried every recipe candidate, even when it found review items. Exit code `1` means it wrote a marked **partial** checklist and inventory because one or more JSON files or recipe candidates could not be inventoried; fix the named items and run it again before importing. This includes an all-malformed source folder, so the partial outputs still identify the problem. Invalid arguments, unsafe output paths, and unreadable folders return exit code `2`. Run `recipe-move-check --help` to see every option.
 
 ## Supported export fields
 
 - Mealie: names, Schema.org ingredients, instruction text, tags, servings, and local image paths.
-- Tandoor: names, structured steps and ingredients, keywords, servings, and local image paths.
+- Tandoor: names, structured steps and ingredients, keywords, servings, local image paths, and the sibling image in its default per-recipe ZIP export.
 
 The JSON inventory keeps unknown field names and lists them for review. Image hashes identify equal files inside the selected folders. They do not copy an image or grant rights to it.
 

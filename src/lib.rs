@@ -4,9 +4,11 @@ use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::{Display, Formatter};
 use std::fs;
+use std::io::{Cursor, Read};
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use std::time::{SystemTime, UNIX_EPOCH};
+use zip::ZipArchive;
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
@@ -104,8 +106,8 @@ pub struct Collision {
 pub struct Warning {
     pub file: String,
     pub message: String,
-    /// True when a recipe JSON file could not be read. The generated outputs
-    /// are useful, but do not describe every file in the selected exports.
+    /// True when a JSON input or recipe candidate could not be inventoried.
+    /// The generated outputs are useful, but do not describe every selected input.
     pub affects_completeness: bool,
 }
 
@@ -142,11 +144,17 @@ pub struct CheckResult {
 pub fn run_check(options: CheckOptions) -> Result<CheckResult, String> {
     let source_root = validate_export(&options.source)?;
     let destination_root = validate_export(&options.destination)?;
+    if source_root == destination_root {
+        return Err(format!(
+            "source and destination folders resolve to the same folder: {}. Choose two different exports",
+            source_root.display()
+        ));
+    }
     validate_output_paths(&options, &[source_root, destination_root])?;
     let (source_recipes, mut warnings) = read_export(&options.source)?;
     let (destination_recipes, destination_warnings) = read_export(&options.destination)?;
     warnings.extend(destination_warnings);
-    if source_recipes.is_empty() {
+    if source_recipes.is_empty() && !warnings.iter().any(|warning| warning.affects_completeness) {
         return Err(format!(
             "no recipes were found in {}. Check the folder and export type",
             options.source.folder.display()
@@ -371,30 +379,33 @@ fn write_parent(path: &Path) -> Result<(), String> {
     Ok(())
 }
 
+#[derive(Debug, Clone)]
+struct JsonInput {
+    display_path: String,
+    relative_path: String,
+    bytes: Vec<u8>,
+    json_file: Option<PathBuf>,
+    sibling_image: Option<ImageCheck>,
+}
+
 fn read_export(spec: &ExportSpec) -> Result<(Vec<Recipe>, Vec<Warning>), String> {
-    let mut files = Vec::new();
-    collect_json(&spec.folder, &mut files)
-        .map_err(|e| format!("could not read {}: {e}", spec.folder.display()))?;
-    files.sort();
-    let mut recipes = Vec::new();
+    let root = fs::canonicalize(&spec.folder).map_err(|e| {
+        format!(
+            "could not resolve export folder {}: {e}",
+            spec.folder.display()
+        )
+    })?;
+    let mut inputs = Vec::new();
     let mut warnings = Vec::new();
-    for path in files {
-        let bytes = match fs::read(&path) {
-            Ok(bytes) => bytes,
-            Err(error) => {
-                warnings.push(Warning {
-                    file: path.display().to_string(),
-                    message: format!("could not read JSON: {error}"),
-                    affects_completeness: true,
-                });
-                continue;
-            }
-        };
-        let value: Value = match serde_json::from_slice(&bytes) {
+    collect_export_inputs(&root, &root, spec.system, &mut inputs, &mut warnings)?;
+    inputs.sort_by(|left, right| left.relative_path.cmp(&right.relative_path));
+    let mut recipes = Vec::new();
+    for input in inputs {
+        let value: Value = match serde_json::from_slice(&input.bytes) {
             Ok(value) => value,
             Err(error) => {
                 warnings.push(Warning {
-                    file: path.display().to_string(),
+                    file: input.display_path,
                     message: format!("invalid JSON: {error}"),
                     affects_completeness: true,
                 });
@@ -412,9 +423,19 @@ fn read_export(spec: &ExportSpec) -> Result<(Vec<Recipe>, Vec<Warning>), String>
         } else {
             vec![&value]
         };
+        if candidates.is_empty() {
+            warnings.push(unusable_candidate_warning(
+                &input,
+                None,
+                "contains no recipe candidates",
+            ));
+        }
         for (index, candidate) in candidates.into_iter().enumerate() {
-            if let Some(recipe) = parse_recipe(candidate, spec, &path, index)? {
-                recipes.push(recipe);
+            match parse_recipe(candidate, spec, &input, index) {
+                Ok(recipe) => recipes.push(recipe),
+                Err(reason) => {
+                    warnings.push(unusable_candidate_warning(&input, Some(index), &reason))
+                }
             }
         }
     }
@@ -422,46 +443,243 @@ fn read_export(spec: &ExportSpec) -> Result<(Vec<Recipe>, Vec<Warning>), String>
     Ok((recipes, warnings))
 }
 
-fn collect_json(folder: &Path, output: &mut Vec<PathBuf>) -> std::io::Result<()> {
-    for entry in fs::read_dir(folder)? {
-        let path = entry?.path();
-        if path.is_dir() {
-            collect_json(&path, output)?;
-        } else if path
-            .extension()
-            .and_then(|x| x.to_str())
-            .is_some_and(|x| x.eq_ignore_ascii_case("json"))
-        {
-            output.push(path);
+fn collect_export_inputs(
+    root: &Path,
+    folder: &Path,
+    system: RecipeSystem,
+    output: &mut Vec<JsonInput>,
+    warnings: &mut Vec<Warning>,
+) -> Result<(), String> {
+    for entry in fs::read_dir(folder).map_err(|e| e.to_string())? {
+        let entry = entry.map_err(|e| e.to_string())?;
+        let path = entry.path();
+        let file_type = entry.file_type().map_err(|e| e.to_string())?;
+        if file_type.is_symlink() {
+            let resolved = match fs::canonicalize(&path) {
+                Ok(resolved) => resolved,
+                Err(error) => {
+                    warnings.push(Warning {
+                        file: path.display().to_string(),
+                        message: format!("could not resolve symlink: {error}"),
+                        affects_completeness: true,
+                    });
+                    continue;
+                }
+            };
+            if !resolved.starts_with(root) {
+                warnings.push(Warning {
+                    file: path.display().to_string(),
+                    message: "skipped symlink outside the selected export folder".into(),
+                    affects_completeness: true,
+                });
+                continue;
+            }
+            if resolved.is_dir() {
+                warnings.push(Warning {
+                    file: path.display().to_string(),
+                    message: "skipped directory symlink; export folders are not followed through symlinks".into(),
+                    affects_completeness: true,
+                });
+                continue;
+            }
+            if resolved.is_file() {
+                collect_input_file(root, &path, &resolved, system, output, warnings)?;
+            }
+        } else if file_type.is_dir() {
+            collect_export_inputs(root, &path, system, output, warnings)?;
+        } else if file_type.is_file() {
+            let resolved = fs::canonicalize(&path)
+                .map_err(|error| format!("could not resolve {}: {error}", path.display()))?;
+            if !resolved.starts_with(root) {
+                warnings.push(Warning {
+                    file: path.display().to_string(),
+                    message: "skipped file outside the selected export folder".into(),
+                    affects_completeness: true,
+                });
+                continue;
+            }
+            collect_input_file(root, &path, &resolved, system, output, warnings)?;
         }
     }
     Ok(())
 }
 
+fn collect_input_file(
+    root: &Path,
+    visible_path: &Path,
+    resolved_path: &Path,
+    system: RecipeSystem,
+    output: &mut Vec<JsonInput>,
+    warnings: &mut Vec<Warning>,
+) -> Result<(), String> {
+    let relative = visible_path
+        .strip_prefix(root)
+        .or_else(|_| resolved_path.strip_prefix(root))
+        .unwrap_or(visible_path)
+        .display()
+        .to_string();
+    if has_extension(&resolved_path.display().to_string(), "json") {
+        match fs::read(resolved_path) {
+            Ok(bytes) => output.push(JsonInput {
+                display_path: visible_path.display().to_string(),
+                relative_path: relative,
+                bytes,
+                json_file: Some(resolved_path.to_path_buf()),
+                sibling_image: None,
+            }),
+            Err(error) => warnings.push(Warning {
+                file: visible_path.display().to_string(),
+                message: format!("could not read JSON: {error}"),
+                affects_completeness: true,
+            }),
+        }
+    } else if system == RecipeSystem::Tandoor
+        && has_extension(&resolved_path.display().to_string(), "zip")
+    {
+        match fs::read(resolved_path) {
+            Ok(bytes) => collect_tandoor_zip(&bytes, &relative, 0, output, warnings)?,
+            Err(error) => warnings.push(Warning {
+                file: visible_path.display().to_string(),
+                message: format!("could not read Tandoor archive: {error}"),
+                affects_completeness: true,
+            }),
+        }
+    }
+    Ok(())
+}
+
+fn collect_tandoor_zip(
+    bytes: &[u8],
+    label: &str,
+    depth: u8,
+    output: &mut Vec<JsonInput>,
+    warnings: &mut Vec<Warning>,
+) -> Result<(), String> {
+    if depth > 2 {
+        warnings.push(Warning {
+            file: label.into(),
+            message: "skipped archive nested too deeply".into(),
+            affects_completeness: true,
+        });
+        return Ok(());
+    }
+    let mut archive = match ZipArchive::new(Cursor::new(bytes)) {
+        Ok(archive) => archive,
+        Err(error) => {
+            warnings.push(Warning {
+                file: label.into(),
+                message: format!("invalid Tandoor ZIP archive: {error}"),
+                affects_completeness: true,
+            });
+            return Ok(());
+        }
+    };
+    let mut entries = Vec::new();
+    for index in 0..archive.len() {
+        let mut file = match archive.by_index(index) {
+            Ok(file) => file,
+            Err(error) => {
+                warnings.push(Warning {
+                    file: label.into(),
+                    message: format!("could not read ZIP entry: {error}"),
+                    affects_completeness: true,
+                });
+                continue;
+            }
+        };
+        if file.is_dir() {
+            continue;
+        }
+        let name = file.name().replace('\\', "/");
+        let mut entry_bytes = Vec::new();
+        if let Err(error) = file.read_to_end(&mut entry_bytes) {
+            warnings.push(Warning {
+                file: format!("{label}!{name}"),
+                message: format!("could not read ZIP entry: {error}"),
+                affects_completeness: true,
+            });
+            continue;
+        }
+        entries.push((name, entry_bytes));
+    }
+    for (name, entry_bytes) in &entries {
+        let entry_label = format!("{label}!{name}");
+        if has_extension(name, "json") {
+            output.push(JsonInput {
+                display_path: entry_label.clone(),
+                relative_path: entry_label.clone(),
+                bytes: entry_bytes.clone(),
+                json_file: None,
+                sibling_image: sibling_archive_image(name, &entries),
+            });
+        } else if has_extension(name, "zip") {
+            collect_tandoor_zip(entry_bytes, &entry_label, depth + 1, output, warnings)?;
+        }
+    }
+    Ok(())
+}
+
+fn has_extension(name: &str, extension: &str) -> bool {
+    Path::new(name)
+        .extension()
+        .and_then(|value| value.to_str())
+        .is_some_and(|value| value.eq_ignore_ascii_case(extension))
+}
+
+fn sibling_archive_image(json_name: &str, entries: &[(String, Vec<u8>)]) -> Option<ImageCheck> {
+    let json_path = Path::new(json_name);
+    let parent = json_path.parent().unwrap_or_else(|| Path::new(""));
+    entries.iter().find_map(|(name, bytes)| {
+        let path = Path::new(name);
+        (path.parent().unwrap_or_else(|| Path::new("")) == parent
+            && path.file_stem().and_then(|stem| stem.to_str()) == Some("image")
+            && path.extension().is_some())
+        .then(|| ImageCheck {
+            declared_path: Some(name.clone()),
+            status: "present".into(),
+            sha256: Some(format!("{:x}", Sha256::digest(bytes))),
+        })
+    })
+}
+
+fn unusable_candidate_warning(input: &JsonInput, index: Option<usize>, reason: &str) -> Warning {
+    Warning {
+        file: index
+            .map(|index| format!("{}#{index}", input.display_path))
+            .unwrap_or_else(|| input.display_path.clone()),
+        message: format!("recipe candidate was not inventoried: {reason}"),
+        affects_completeness: true,
+    }
+}
+
 fn parse_recipe(
     value: &Value,
     spec: &ExportSpec,
-    file: &Path,
+    input: &JsonInput,
     index: usize,
-) -> Result<Option<Recipe>, String> {
+) -> Result<Recipe, String> {
     let root = value
         .get("recipe")
         .filter(|v| v.is_object())
         .unwrap_or(value);
     let Some(object) = root.as_object() else {
-        return Ok(None);
+        return Err("it is not a JSON object".into());
     };
     let Some(name) = string_at(root, &["name", "title"]) else {
-        return Ok(None);
+        return Err("it has no usable name or title".into());
     };
     if name.trim().is_empty() {
-        return Ok(None);
+        return Err("it has no usable name or title".into());
     }
-    let ingredients = strings_at(
+    let mut ingredients = strings_at(
         root,
         &["recipeIngredient", "ingredients"],
         extract_ingredient,
     );
+    if spec.system == RecipeSystem::Tandoor {
+        ingredients.extend(tandoor_step_ingredients(root));
+    }
+    ingredients.retain(|ingredient| !ingredient.trim().is_empty());
     let instructions = strings_at(
         root,
         &["recipeInstructions", "instructions", "steps"],
@@ -472,7 +690,20 @@ fn parse_recipe(
     let owner = string_at(root, &["owner", "created_by", "createdBy"]);
     let household = string_at(root, &["household", "space", "group"]);
     let declared_image = string_at(root, &["image", "image_path", "imagePath", "recipe_image"]);
-    let image = inspect_image(declared_image, file, &spec.folder)?;
+    let image = match (declared_image, &input.json_file, &input.sibling_image) {
+        (Some(declared), Some(file), _) => inspect_image(Some(declared), file, &spec.folder)?,
+        (Some(declared), None, Some(image)) => ImageCheck {
+            declared_path: Some(declared),
+            ..image.clone()
+        },
+        (Some(declared), None, None) => restricted_image(declared),
+        (None, _, Some(image)) => image.clone(),
+        (None, _, None) => ImageCheck {
+            declared_path: None,
+            status: "not_declared".into(),
+            sha256: None,
+        },
+    };
     let known = known_fields(spec.system);
     let mut unmapped_fields: Vec<String> = object
         .keys()
@@ -484,11 +715,7 @@ fn parse_recipe(
     }
     unmapped_fields.sort();
     unmapped_fields.dedup();
-    let relative = file
-        .strip_prefix(&spec.folder)
-        .unwrap_or(file)
-        .display()
-        .to_string();
+    let relative = input.relative_path.clone();
     let id = format!(
         "{}:{}{}",
         spec.system,
@@ -499,7 +726,7 @@ fn parse_recipe(
             format!("#{index}")
         }
     );
-    Ok(Some(Recipe {
+    Ok(Recipe {
         id,
         name,
         system: spec.system,
@@ -512,7 +739,19 @@ fn parse_recipe(
         household,
         image,
         unmapped_fields,
-    }))
+    })
+}
+
+fn tandoor_step_ingredients(value: &Value) -> Vec<String> {
+    value
+        .get("steps")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .filter_map(|step| step.get("ingredients").and_then(Value::as_array))
+        .flatten()
+        .filter_map(extract_ingredient)
+        .collect()
 }
 
 fn known_fields(system: RecipeSystem) -> BTreeSet<&'static str> {
@@ -891,7 +1130,7 @@ fn render_report(result: &CheckResult) -> String {
             .count();
         if partial > 0 {
             text.push_str(&format!(
-                "**This checklist is partial.** {partial} JSON file(s) could not be read. The CLI returns exit code 1 so scripts can stop before importing. Fix the files below and run the check again.\n\n"
+                "**This checklist is partial.** {partial} JSON input(s) or recipe candidate(s) could not be inventoried. The CLI returns exit code 1 so scripts can stop before importing. Fix the items below and run the check again.\n\n"
             ));
         }
         for warning in &result.warnings {
@@ -995,7 +1234,19 @@ pub fn run_demo() -> Result<(CheckResult, PathBuf), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::io::Write;
     use tempfile::tempdir;
+
+    fn zip_bytes(files: &[(&str, &[u8])]) -> Vec<u8> {
+        let mut archive = zip::ZipWriter::new(Cursor::new(Vec::new()));
+        for (name, bytes) in files {
+            archive
+                .start_file(*name, zip::write::SimpleFileOptions::default())
+                .unwrap();
+            archive.write_all(bytes).unwrap();
+        }
+        archive.finish().unwrap().into_inner()
+    }
 
     #[test]
     fn documented_example_finds_collision_and_review_items() {
@@ -1214,5 +1465,209 @@ mod tests {
         assert!(checklist.contains("This checklist is partial"));
         assert!(checklist.contains("exit code 1"));
         assert!(checklist.contains("No owner or household access checks were found."));
+    }
+
+    #[test]
+    fn tandoor_default_outer_zip_keeps_step_ingredients_and_sibling_image() {
+        let temp = tempdir().unwrap();
+        let source = temp.path().join("tandoor-export");
+        let destination = temp.path().join("mealie-export");
+        fs::create_dir(&source).unwrap();
+        fs::create_dir(&destination).unwrap();
+        let recipe = br#"{
+            "id": 123,
+            "name": "Real Tandoor Soup",
+            "steps": [{"instruction":"Simmer gently.","ingredients":[{"amount":1,"unit":{"name":"cup"},"food":{"name":"lentils"}}]}],
+            "servings_text":"4"
+        }"#;
+        let per_recipe = zip_bytes(&[("recipe.json", recipe), ("image.jpg", b"sibling image")]);
+        let outer = zip_bytes(&[("123.zip", &per_recipe)]);
+        fs::write(source.join("export_2026-08-29.zip"), outer).unwrap();
+        fs::write(
+            destination.join("recipe.json"),
+            r#"{"name":"Existing soup"}"#,
+        )
+        .unwrap();
+        let result = run_check(CheckOptions {
+            source: ExportSpec {
+                system: RecipeSystem::Tandoor,
+                folder: source,
+            },
+            destination: ExportSpec {
+                system: RecipeSystem::Mealie,
+                folder: destination,
+            },
+            report: temp.path().join("report.md"),
+            inventory: temp.path().join("inventory.json"),
+        })
+        .unwrap();
+        assert_eq!(result.summary.source_recipes, 1);
+        let recipe = &result.source_recipes[0];
+        assert_eq!(recipe.ingredients, ["1 cup lentils"]);
+        assert_eq!(recipe.instructions, ["Simmer gently."]);
+        assert_eq!(recipe.image.status, "present");
+        assert_eq!(recipe.image.declared_path.as_deref(), Some("image.jpg"));
+        assert!(recipe
+            .image
+            .sha256
+            .as_deref()
+            .is_some_and(|hash| hash.len() == 64));
+        assert!(recipe
+            .unmapped_fields
+            .contains(&"servings_text".to_string()));
+        assert!(recipe
+            .source_file
+            .contains("export_2026-08-29.zip!123.zip!recipe.json"));
+    }
+
+    #[test]
+    fn all_malformed_source_still_writes_partial_outputs() {
+        let temp = tempdir().unwrap();
+        let source = temp.path().join("source");
+        let destination = temp.path().join("destination");
+        fs::create_dir(&source).unwrap();
+        fs::create_dir(&destination).unwrap();
+        fs::write(source.join("broken.json"), "{bad json").unwrap();
+        fs::write(
+            destination.join("recipe.json"),
+            r#"{"name":"Existing toast"}"#,
+        )
+        .unwrap();
+        let report = temp.path().join("report.md");
+        let inventory = temp.path().join("inventory.json");
+        let result = run_check(CheckOptions {
+            source: ExportSpec {
+                system: RecipeSystem::Mealie,
+                folder: source,
+            },
+            destination: ExportSpec {
+                system: RecipeSystem::Tandoor,
+                folder: destination,
+            },
+            report: report.clone(),
+            inventory: inventory.clone(),
+        })
+        .unwrap();
+        assert_eq!(result.summary.source_recipes, 0);
+        assert!(result
+            .warnings
+            .iter()
+            .any(|warning| warning.file.ends_with("broken.json")));
+        assert!(fs::read_to_string(report)
+            .unwrap()
+            .contains("This checklist is partial"));
+        let written: CheckResult = serde_json::from_slice(&fs::read(inventory).unwrap()).unwrap();
+        assert!(written
+            .warnings
+            .iter()
+            .any(|warning| warning.affects_completeness));
+    }
+
+    #[test]
+    fn recipe_like_json_without_a_name_is_a_partial_input_warning() {
+        let temp = tempdir().unwrap();
+        let source = temp.path().join("source");
+        let destination = temp.path().join("destination");
+        fs::create_dir(&source).unwrap();
+        fs::create_dir(&destination).unwrap();
+        fs::write(source.join("valid.json"), r#"{"name":"Moving toast"}"#).unwrap();
+        fs::write(
+            source.join("nameless.json"),
+            r#"{"id":123,"ingredients":["bread"],"instructions":["Toast"]}"#,
+        )
+        .unwrap();
+        fs::write(
+            destination.join("recipe.json"),
+            r#"{"name":"Existing toast"}"#,
+        )
+        .unwrap();
+        let result = run_check(CheckOptions {
+            source: ExportSpec {
+                system: RecipeSystem::Mealie,
+                folder: source,
+            },
+            destination: ExportSpec {
+                system: RecipeSystem::Tandoor,
+                folder: destination,
+            },
+            report: temp.path().join("report.md"),
+            inventory: temp.path().join("inventory.json"),
+        })
+        .unwrap();
+        assert_eq!(result.summary.source_recipes, 1);
+        assert!(result.warnings.iter().any(|warning| {
+            warning.file.ends_with("nameless.json#0")
+                && warning.message.contains("no usable name or title")
+                && warning.affects_completeness
+        }));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn json_symlink_outside_export_is_not_read_and_marks_output_partial() {
+        use std::os::unix::fs::symlink;
+
+        let temp = tempdir().unwrap();
+        let source = temp.path().join("source");
+        let destination = temp.path().join("destination");
+        fs::create_dir(&source).unwrap();
+        fs::create_dir(&destination).unwrap();
+        fs::write(source.join("inside.json"), r#"{"name":"Inside recipe"}"#).unwrap();
+        let outside = temp.path().join("outside.json");
+        fs::write(&outside, r#"{"name":"Outside private recipe"}"#).unwrap();
+        symlink(&outside, source.join("linked.json")).unwrap();
+        fs::write(
+            destination.join("recipe.json"),
+            r#"{"name":"Existing recipe"}"#,
+        )
+        .unwrap();
+        let result = run_check(CheckOptions {
+            source: ExportSpec {
+                system: RecipeSystem::Mealie,
+                folder: source,
+            },
+            destination: ExportSpec {
+                system: RecipeSystem::Tandoor,
+                folder: destination,
+            },
+            report: temp.path().join("report.md"),
+            inventory: temp.path().join("inventory.json"),
+        })
+        .unwrap();
+        assert_eq!(
+            result
+                .source_recipes
+                .iter()
+                .map(|recipe| &recipe.name)
+                .collect::<Vec<_>>(),
+            ["Inside recipe"]
+        );
+        assert!(result.warnings.iter().any(|warning| {
+            warning.file.ends_with("linked.json")
+                && warning.message.contains("outside the selected export")
+                && warning.affects_completeness
+        }));
+    }
+
+    #[test]
+    fn identical_source_and_destination_folders_are_rejected() {
+        let temp = tempdir().unwrap();
+        let export = temp.path().join("export");
+        fs::create_dir(&export).unwrap();
+        fs::write(export.join("recipe.json"), r#"{"name":"Toast"}"#).unwrap();
+        let error = run_check(CheckOptions {
+            source: ExportSpec {
+                system: RecipeSystem::Mealie,
+                folder: export.clone(),
+            },
+            destination: ExportSpec {
+                system: RecipeSystem::Tandoor,
+                folder: export,
+            },
+            report: temp.path().join("report.md"),
+            inventory: temp.path().join("inventory.json"),
+        })
+        .unwrap_err();
+        assert!(error.contains("source and destination folders resolve to the same folder"));
     }
 }

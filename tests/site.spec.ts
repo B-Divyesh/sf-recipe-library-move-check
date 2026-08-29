@@ -11,6 +11,7 @@ import {
   readdirSync,
   rmSync,
   statSync,
+  symlinkSync,
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
@@ -277,6 +278,21 @@ test("@claim:safe-output-paths rejects export, input-alias, and overlapping outp
   const overlappingOutputs = run(shared, shared);
   expect(overlappingOutputs.status).toBe(2);
   expect(overlappingOutputs.stderr).toContain("report and inventory paths overlap");
+
+  const outside = join(sandbox, "private.json");
+  writeFileSync(outside, '{"name":"Outside private recipe"}');
+  symlinkSync(outside, join(source, "linked.json"));
+  const escapedSymlink = run(join(output, "symlink-report.md"), join(output, "symlink-inventory.json"));
+  expect(escapedSymlink.status).toBe(1);
+  expect(escapedSymlink.stdout).toContain("linked.json");
+  expect(readFileSync(join(output, "symlink-inventory.json"), "utf8")).not.toContain("Outside private recipe");
+  const identicalRoots = spawnSync("cargo", [
+    "run", "--quiet", "--", "check", "--source", `mealie:${source}`, "--destination", `tandoor:${source}`,
+    "--report", join(output, "same-report.md"), "--inventory", join(output, "same-inventory.json"),
+  ], { cwd: process.cwd(), encoding: "utf8" });
+  expect(identicalRoots.status).toBe(2);
+  expect(identicalRoots.stderr).toContain("source and destination folders resolve to the same folder");
+  rmSync(join(source, "linked.json"));
   expect(treeDigest(source)).toEqual(sourceBefore);
   expect(treeDigest(destination)).toEqual(destinationBefore);
   rmSync(sandbox, { recursive: true, force: true });
@@ -325,6 +341,37 @@ test("@claim:partial-read-warnings writes a marked partial checklist and returns
   expect(checklist).toContain("exit code 1");
   expect(JSON.parse(readFileSync(inventory, "utf8")).warnings).toMatchObject([
     { affects_completeness: true, message: expect.stringContaining("invalid JSON") },
+  ]);
+
+  const allBroken = join(sandbox, "all-broken");
+  mkdirSync(allBroken);
+  writeFileSync(join(allBroken, "broken.json"), "{not valid JSON");
+  const allBrokenReport = join(output, "all-broken.md");
+  const allBrokenInventory = join(output, "all-broken.json");
+  const allBrokenResult = spawnSync("cargo", [
+    "run", "--quiet", "--", "check", "--source", `mealie:${allBroken}`, "--destination", `tandoor:${destination}`,
+    "--report", allBrokenReport, "--inventory", allBrokenInventory,
+  ], { cwd: process.cwd(), encoding: "utf8" });
+  expect(allBrokenResult.status).toBe(1);
+  expect(allBrokenResult.stdout).toContain("broken.json");
+  expect(readFileSync(allBrokenReport, "utf8")).toContain("This checklist is partial");
+  expect(JSON.parse(readFileSync(allBrokenInventory, "utf8")).summary.source_recipes).toBe(0);
+
+  const nameless = join(sandbox, "nameless");
+  mkdirSync(nameless);
+  writeFileSync(join(nameless, "valid.json"), '{"name":"Moving toast"}');
+  writeFileSync(join(nameless, "nameless.json"), '{"id":123,"ingredients":["bread"],"instructions":["Toast"]}');
+  const namelessReport = join(output, "nameless.md");
+  const namelessInventory = join(output, "nameless.json");
+  const namelessResult = spawnSync("cargo", [
+    "run", "--quiet", "--", "check", "--source", `mealie:${nameless}`, "--destination", `tandoor:${destination}`,
+    "--report", namelessReport, "--inventory", namelessInventory,
+  ], { cwd: process.cwd(), encoding: "utf8" });
+  expect(namelessResult.status).toBe(1);
+  expect(namelessResult.stdout).toContain("nameless.json#0");
+  expect(readFileSync(namelessReport, "utf8")).toContain("no usable name or title");
+  expect(JSON.parse(readFileSync(namelessInventory, "utf8")).warnings).toMatchObject([
+    { affects_completeness: true, message: expect.stringContaining("no usable name or title") },
   ]);
   rmSync(sandbox, { recursive: true, force: true });
 });
