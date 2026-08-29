@@ -15,6 +15,8 @@ import {
 import { tmpdir } from "node:os";
 import { basename, join, relative } from "node:path";
 
+const EXPECTED_ORIGIN = new URL(process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:4173").origin;
+
 type CliResult = {
   source_system: string;
   destination_system: string;
@@ -80,7 +82,7 @@ test("@claim:sample-findings shows every recorded sample finding", async ({ page
 test("@claim:demo-privacy isolates, resets, and discards the browser sample", async ({ page }) => {
   const outgoing: string[] = [];
   page.on("request", request => {
-    if (new URL(request.url()).origin !== "http://127.0.0.1:4173") outgoing.push(request.url());
+    if (new URL(request.url()).origin !== EXPECTED_ORIGIN) outgoing.push(request.url());
   });
   await page.goto("/?demo=1");
   await expect(page.getByRole("status")).toContainText("sample data, nothing is saved");
@@ -422,7 +424,7 @@ test("keyboard navigation, route focus, and browser Back restore the page", asyn
   await expect(page).toHaveURL(/\?demo=1$/);
   await expect(page.locator("h1")).toBeFocused();
   await page.goBack();
-  await expect(page).toHaveURL("http://127.0.0.1:4173/");
+  await expect(page).toHaveURL(`${EXPECTED_ORIGIN}/`);
   await expect(page.locator("h1")).toBeFocused();
 });
 

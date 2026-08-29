@@ -49,3 +49,16 @@ Every finding in review 1 is required. “Evidence” names the exact automated 
 - .factory/screenshots/polish-1-404-desktop.png
 
 Final clean-clone commands and cold live results are recorded in .factory/handoff.md after deployment.
+
+## Cold live recheck by finding
+
+The production origin was opened in a fresh Chromium context after deployment. Tests ran with PLAYWRIGHT_BASE_URL set to the live origin.
+
+| Findings | Live evidence |
+| --- | --- |
+| F-1-02, F-1-08, F-1-15, F-1-16, F-1-17, F-1-20 | /?demo=1 passed the sample, recording, replay, reset, storage, and screenshot checks. See .factory/live-verification/screenshot-desktop.png. |
+| F-1-03, F-1-04, F-1-05, F-1-06, F-1-18, F-1-19 | / passed cold-copy, CTA, purchase, terminology, and mobile layout checks. See .factory/live-verification/screenshot-mobile.png. |
+| F-1-14 | /privacy and the recorded licensed flow passed exact origin, query, body, referrer, storage, title, and axe checks. |
+| F-1-01, F-1-07, F-1-09, F-1-10, F-1-11, F-1-12, F-1-13, F-1-21 | These are CLI/package/README findings. They passed from the clean clone; the live install and demo documentation links also returned 200. |
+
+Live route status was 200 for /, /?demo=1, /demo, /privacy, and /terms. /missing-page returned 404 with the designed recovery screen.
