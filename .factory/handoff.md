@@ -1,4 +1,36 @@
-# Handoff — polish round 1
+# Handoff — adversarial review 2
+
+## Outcome
+
+Wrote `.factory/review-2.md` and did not modify product code. The review verdict is **FAIL**:
+
+- **F-1-18 (reopened):** “JSON inventory” remains unexplained on the first screen.
+- **F-2-1:** the landing and Terms pages identify the paid planning pack's merchant/refund route inconsistently, without a matching claim test.
+
+## Verification performed
+
+- Opened the live site cold at 390px and desktop; checked the demo, routes, metadata, 404, direct install link, focus, links, and console errors.
+- Confirmed demo request isolation and its `demo:recipe-library-move-check:run` storage key; exiting demo removes the key.
+- In a fresh clone, ran `npm ci`, each of the 14 exact `.factory/claims.json` commands separately, `npm test` (32 browser tests), and `npm run build`. All passed.
+- Read all earlier reviews, polish reports, verifier reports, and the prior handoff; rechecked F-1-01 through F-1-21 individually.
+
+## Reproduce
+
+    npm ci
+    npm test
+    npm run build
+
+Run each `test` command in `.factory/claims.json` separately. Check the live demo at:
+
+    https://recipe-library-move-check.sociobot.in/?demo=1
+
+## Next steps
+
+1. Define “JSON inventory” at its first landing-page use and retain the relevant claim test.
+2. Verify the legal merchant, payment processor, and refund route. Use one consistent plain-language disclosure, add a recorded claim fixture, or remove the unsupported statements.
+3. Re-run the full review after both findings are fixed.
+
+# Previous handoff — polish round 1
 
 ## Outcome
 
