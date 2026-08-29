@@ -1164,7 +1164,7 @@ fn render_report(result: &CheckResult) -> String {
     if family_review_count == 0 {
         text.push_str("No owner or household access checks were found.\n");
     }
-    text.push_str("\n## Before importing\n\n- [ ] Back up both original export folders.\n- [ ] Resolve every possible duplicate above.\n- [ ] Locate missing images or accept that they will be absent.\n- [ ] Assign owners and household access.\n- [ ] Import a small test batch first.\n- [ ] Keep this report beside the untouched exports.\n\nThis checker reads exports only. Similarity is a review hint, not proof of a duplicate. Image hashes do not grant permission to copy content.\n");
+    text.push_str("\n## Before importing\n\n- [ ] Back up both original export folders.\n- [ ] Resolve every possible duplicate above.\n- [ ] Locate missing images or accept that they will be absent.\n- [ ] Assign owners and household access.\n- [ ] Import a small test batch first.\n- [ ] Keep this report beside the untouched exports.\n\nThis checker reads exports only. Similarity is a review hint, not proof of a duplicate. Matching image files do not grant permission to copy content.\n");
     text
 }
 

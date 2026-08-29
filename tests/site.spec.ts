@@ -77,7 +77,7 @@ test("@claim:sample-findings shows every recorded sample finding", async ({ page
   await expect(tally).toContainText("1possible duplicate");
   await expect(tally).toContainText("1missing image");
   await expect(tally).toContainText("3fields to review");
-  await expect(page.getByText("Same name, ingredient list, and image hash.")).toBeVisible();
+  await expect(page.getByText("The names and ingredients match. The image files match exactly.")).toBeVisible();
   await expect(page.getByText("The export points to")).toContainText("missing.jpg");
   await expect(page.getByText("Choose the new owner and recreate family access.")).toBeVisible();
 });
@@ -687,7 +687,7 @@ test("public package copy keeps the documented plain terms", async () => {
   const changelog = readFileSync("CHANGELOG.md", "utf8");
   const readme = readFileSync("README.md", "utf8");
   expect(manifest).toContain('description = "Check Mealie and Tandoor recipe-library moves before importing"');
-  expect(changelog).toContain("Add a JSON inventory, possible-duplicate checks, image hashing, and Markdown checklists.");
+  expect(changelog).toContain("Add a JSON inventory, possible-duplicate checks, exact image-file matches, and Markdown checklists.");
   const publicCopy = `${manifest}\n${changelog}\n${readme}`;
   expect(publicCopy).not.toMatch(/\bpreflight\b/i);
   expect(publicCopy).not.toMatch(/\bneutral inventory\b/i);

@@ -1,6 +1,6 @@
-# Copy audit — polish round 3
+# Copy audit — polish round 4
 
-Audited 29 August 2026 after the round-three rewrites. Counts treat product names, commands, paths, and prices as one word. No landing-page sentence exceeds 22 words. No copy uses a banned marketing word.
+Audited 29 August 2026 after the round-four rewrites. Counts treat product names, commands, paths, and prices as one word. No landing-page sentence exceeds 22 words. No copy uses a banned marketing word.
 
 ## First screen
 
@@ -25,7 +25,7 @@ Audited 29 August 2026 after the round-three rewrites. Counts treat product name
 | Recorded from recipe-move-check demo --json using the bundled sample. | 8 | Pass; `demo-is-real-cli` |
 | What the check catches | 4 | Pass |
 | Lemon Pasta may already exist | 5 | Pass |
-| Same name, ingredient list, and image hash. | 7 | Pass; `sample-findings` |
+| The names and ingredients match. The image files match exactly. | 10 | Pass; `sample-findings` |
 | Red Lentil Soup has no image file | 7 | Pass |
 | The export points to missing.jpg. | 5 | Pass; `sample-findings` |
 | Household access needs a decision | 5 | Pass |
@@ -101,3 +101,5 @@ The old terms “preflight,” “collision,” “likely duplicate,” and pros
 | Exit code 1 means it could not inventory one or more recipe JSON files. | 15 | Pass |
 | It writes partial outputs. | 4 | Pass |
 | Fix the named files, then run it again before importing. | 11 | Pass |
+| The checker marks image files that match exactly inside the selected folders. | 12 | Pass; plain explanation of the checker’s image comparison |
+| Matching image files are only a comparison clue. | 8 | Pass; Terms limitation |

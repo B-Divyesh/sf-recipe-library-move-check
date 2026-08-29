@@ -46,7 +46,7 @@ Exit code `0` means the check inventoried every recipe file, even when it found 
 - Mealie: names, Schema.org ingredients, instruction text, tags, servings, and local image paths.
 - Tandoor: names, structured steps and ingredients, keywords, servings, local image paths, and the sibling image in its default per-recipe ZIP export.
 
-The JSON inventory keeps unknown field names and lists them for review. Image hashes identify equal files inside the selected folders. They do not copy an image or grant rights to it.
+The JSON inventory keeps unknown field names and lists them for review. The checker marks image files that match exactly inside the selected folders. It does not copy an image or grant rights to it.
 
 ## Install and package
 
