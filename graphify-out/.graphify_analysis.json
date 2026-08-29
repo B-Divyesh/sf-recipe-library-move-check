@@ -17,20 +17,20 @@
       "src_lib_imagecheck",
       "src_lib_inspect_image",
       "src_lib_jaccard",
-      "src_lib_known_fields",
       "src_lib_normalize",
+      "src_lib_outputs",
       "src_lib_parse_recipe",
       "src_lib_read_export",
       "src_lib_recipe",
       "src_lib_render_report",
       "src_lib_restricted_image",
+      "src_lib_rs_string",
       "src_lib_string_at",
       "src_lib_strings_at",
       "src_lib_summary",
       "src_lib_tokens",
       "src_lib_warning",
       "src_lib_write_parent",
-      "string",
       "value",
       "vec"
     ],
@@ -39,8 +39,6 @@
       "err",
       "formatter",
       "fromstr",
-      "pathbuf",
-      "result",
       "self",
       "src_lib_checkoptions",
       "src_lib_documented_example_finds_collision_and_review_items",
@@ -50,10 +48,12 @@
       "src_lib_exportspec_from_str",
       "src_lib_image_hash_can_identify_same_image",
       "src_lib_image_paths_cannot_escape_the_selected_export_folder",
-      "src_lib_outputs",
+      "src_lib_known_fields",
       "src_lib_recipesystem",
       "src_lib_recipesystem_fmt",
       "src_lib_recipesystem_from_str",
+      "src_lib_rs_pathbuf",
+      "src_lib_rs_result",
       "src_lib_run_check",
       "src_lib_run_demo",
       "src_lib_validate_export",
@@ -155,38 +155,42 @@
       "src_main_rs_string"
     ],
     "8": [
+      "tests_site_spec",
+      "tests_site_spec_cliresult",
+      "tests_site_spec_removedemo",
+      "tests_site_spec_runcargo",
+      "tests_site_spec_treedigest"
+    ],
+    "9": [
       "site_public_sw",
       "site_public_sw_shell"
     ],
-    "9": [
-      "pkg_recipe_library_move_check"
-    ],
     "10": [
-      "playwright_config"
+      "pathbuf"
     ],
     "11": [
-      "src_lib_rs_pathbuf"
+      "pkg_recipe_library_move_check"
     ],
     "12": [
-      "src_lib_rs_result"
+      "playwright_config"
     ],
     "13": [
-      "src_lib_rs_string"
+      "result"
     ],
     "14": [
-      "tests_site_spec"
+      "string"
     ]
   },
   "cohesion": {
-    "0": 0.20362903225806453,
+    "0": 0.20161290322580644,
     "1": 0.1422924901185771,
-    "2": 0.2015810276679842,
+    "2": 0.20553359683794467,
     "3": 0.1,
     "4": 0.13333333333333333,
     "5": 0.18181818181818182,
     "6": 0.2857142857142857,
     "7": 0.38095238095238093,
-    "8": 1.0,
+    "8": 0.4,
     "9": 1.0,
     "10": 1.0,
     "11": 1.0,
@@ -211,18 +215,18 @@
       "degree": 12
     },
     {
-      "id": "src_lib_checkresult",
-      "label": "CheckResult",
-      "degree": 11
-    },
-    {
       "id": "src_lib_exportspec",
       "label": "ExportSpec",
       "degree": 11
     },
     {
-      "id": "src_lib_read_export",
-      "label": "read_export()",
+      "id": "src_lib_checkresult",
+      "label": "CheckResult",
+      "degree": 11
+    },
+    {
+      "id": "package_scripts",
+      "label": "scripts",
       "degree": 10
     },
     {
@@ -231,8 +235,8 @@
       "degree": 10
     },
     {
-      "id": "package_scripts",
-      "label": "scripts",
+      "id": "src_lib_read_export",
+      "label": "read_export()",
       "degree": 10
     },
     {
