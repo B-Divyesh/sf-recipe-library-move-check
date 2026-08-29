@@ -2,36 +2,73 @@
   "communities": {
     "0": [
       "btreeset",
-      "src_lib",
+      "option",
       "src_lib_checkresult",
+      "src_lib_collect_export_inputs",
+      "src_lib_collect_input_file",
+      "src_lib_collect_tandoor_zip",
       "src_lib_collision",
+      "src_lib_extract_ingredient",
+      "src_lib_extract_instruction",
+      "src_lib_extract_label",
+      "src_lib_find_collisions",
+      "src_lib_has_extension",
+      "src_lib_imagecheck",
+      "src_lib_inspect_image",
+      "src_lib_jaccard",
+      "src_lib_jsoninput",
+      "src_lib_known_fields",
+      "src_lib_normalize",
+      "src_lib_parse_recipe",
+      "src_lib_read_export",
+      "src_lib_recipe",
+      "src_lib_restricted_image",
+      "src_lib_sibling_archive_image",
+      "src_lib_string_at",
+      "src_lib_strings_at",
+      "src_lib_summary",
+      "src_lib_tandoor_step_ingredients",
+      "src_lib_tokens",
+      "src_lib_unusable_candidate_warning",
+      "src_lib_warning",
+      "string",
+      "value",
+      "vec"
+    ],
+    "1": [
+      "path",
+      "pathbuf",
+      "src_lib",
+      "src_lib_all_malformed_source_still_writes_partial_outputs",
+      "src_lib_checkoptions",
+      "src_lib_collect_files",
       "src_lib_documented_example_finds_collision_and_review_items",
       "src_lib_empty_destination_produces_a_useful_zero_collision_report",
       "src_lib_empty_export_has_a_next_step",
       "src_lib_escape_md",
       "src_lib_export_spec_rejects_unknown_systems",
-      "src_lib_find_collisions",
+      "src_lib_identical_source_and_destination_folders_are_rejected",
       "src_lib_image_hash_can_identify_same_image",
       "src_lib_image_paths_cannot_escape_the_selected_export_folder",
-      "src_lib_jaccard",
-      "src_lib_known_fields",
+      "src_lib_json_symlink_outside_export_is_not_read_and_marks_output_partial",
       "src_lib_malformed_recipe_is_prominent_in_partial_report_and_empty_family_review_explains_itself",
-      "src_lib_normalize",
+      "src_lib_normalize_path",
       "src_lib_output_paths_cannot_overlap_exports_or_each_other",
       "src_lib_outputs",
-      "src_lib_read_export",
-      "src_lib_recipe",
+      "src_lib_path_for_comparison",
+      "src_lib_paths_overlap",
+      "src_lib_recipe_like_json_without_a_name_is_a_partial_input_warning",
       "src_lib_render_report",
       "src_lib_run_check",
       "src_lib_run_demo",
-      "src_lib_summary",
-      "src_lib_tokens",
-      "src_lib_warning",
+      "src_lib_same_file",
+      "src_lib_tandoor_default_outer_zip_keeps_step_ingredients_and_sibling_image",
+      "src_lib_validate_output_paths",
       "src_lib_write_parent",
-      "src_main_main",
-      "vec"
+      "src_lib_zip_bytes",
+      "src_main_main"
     ],
-    "1": [
+    "2": [
       "axe_core_playwright",
       "package",
       "package_devdependencies",
@@ -59,7 +96,7 @@
       "typescript",
       "vite"
     ],
-    "2": [
+    "3": [
       "site_src_main",
       "site_src_main_acceptlicensefromurl",
       "site_src_main_bindactions",
@@ -85,30 +122,6 @@
       "site_src_main_terminal",
       "site_src_main_verifylicense"
     ],
-    "3": [
-      "display",
-      "err",
-      "formatter",
-      "fromstr",
-      "path",
-      "self",
-      "src_lib_checkoptions",
-      "src_lib_collect_files",
-      "src_lib_collect_json",
-      "src_lib_exportspec",
-      "src_lib_exportspec_from_str",
-      "src_lib_normalize_path",
-      "src_lib_path_for_comparison",
-      "src_lib_paths_overlap",
-      "src_lib_recipesystem",
-      "src_lib_recipesystem_fmt",
-      "src_lib_recipesystem_from_str",
-      "src_lib_rs_pathbuf",
-      "src_lib_rs_result",
-      "src_lib_same_file",
-      "src_lib_validate_export",
-      "src_lib_validate_output_paths"
-    ],
     "4": [
       "ref_dom",
       "ref_dom_iterable",
@@ -132,18 +145,25 @@
       "tsconfig_include"
     ],
     "5": [
-      "option",
-      "src_lib_extract_ingredient",
-      "src_lib_extract_instruction",
-      "src_lib_extract_label",
-      "src_lib_imagecheck",
-      "src_lib_inspect_image",
-      "src_lib_parse_recipe",
-      "src_lib_restricted_image",
-      "src_lib_rs_string",
-      "src_lib_string_at",
-      "src_lib_strings_at",
-      "value"
+      "display",
+      "err",
+      "formatter",
+      "fromstr",
+      "result",
+      "self",
+      "src_lib_exportspec",
+      "src_lib_exportspec_from_str",
+      "src_lib_recipesystem",
+      "src_lib_recipesystem_fmt",
+      "src_lib_recipesystem_from_str",
+      "src_lib_validate_export",
+      "src_main",
+      "src_main_cli",
+      "src_main_command",
+      "src_main_parse_export",
+      "src_main_rs_pathbuf",
+      "src_main_rs_result",
+      "src_main_rs_string"
     ],
     "6": [
       "scripts_copy_404",
@@ -155,68 +175,58 @@
       "scripts_copy_404_versionedassets"
     ],
     "7": [
-      "src_main",
-      "src_main_cli",
-      "src_main_command",
-      "src_main_parse_export",
-      "src_main_rs_pathbuf",
-      "src_main_rs_result",
-      "src_main_rs_string"
-    ],
-    "8": [
       "tests_site_spec",
       "tests_site_spec_cliresult",
       "tests_site_spec_removedemo",
       "tests_site_spec_runcargo",
       "tests_site_spec_treedigest"
     ],
-    "9": [
+    "8": [
       "site_public_sw",
       "site_public_sw_shell"
     ],
-    "10": [
-      "pathbuf"
-    ],
-    "11": [
+    "9": [
       "pkg_recipe_library_move_check"
     ],
-    "12": [
+    "10": [
       "playwright_config"
     ],
-    "13": [
-      "result"
+    "11": [
+      "src_lib_rs_pathbuf"
     ],
-    "14": [
-      "string"
+    "12": [
+      "src_lib_rs_result"
+    ],
+    "13": [
+      "src_lib_rs_string"
     ]
   },
   "cohesion": {
-    "0": 0.15270935960591134,
-    "1": 0.07692307692307693,
-    "2": 0.19927536231884058,
-    "3": 0.19480519480519481,
+    "0": 0.1875,
+    "1": 0.14408602150537633,
+    "2": 0.07692307692307693,
+    "3": 0.19927536231884058,
     "4": 0.1,
-    "5": 0.48484848484848486,
+    "5": 0.16374269005847952,
     "6": 0.2857142857142857,
-    "7": 0.38095238095238093,
-    "8": 0.4,
+    "7": 0.4,
+    "8": 1.0,
     "9": 1.0,
     "10": 1.0,
     "11": 1.0,
     "12": 1.0,
-    "13": 1.0,
-    "14": 1.0
+    "13": 1.0
   },
   "gods": [
     {
       "id": "src_lib_run_check",
       "label": "run_check()",
-      "degree": 19
+      "degree": 24
     },
     {
       "id": "src_lib_parse_recipe",
       "label": "parse_recipe()",
-      "degree": 13
+      "degree": 15
     },
     {
       "id": "tsconfig_compileroptions",
@@ -224,8 +234,8 @@
       "degree": 12
     },
     {
-      "id": "src_lib_checkresult",
-      "label": "CheckResult",
+      "id": "src_lib_recipesystem",
+      "label": "RecipeSystem",
       "degree": 11
     },
     {
@@ -234,29 +244,29 @@
       "degree": 11
     },
     {
+      "id": "src_lib_checkresult",
+      "label": "CheckResult",
+      "degree": 11
+    },
+    {
       "id": "src_lib_validate_output_paths",
       "label": "validate_output_paths()",
       "degree": 11
     },
     {
+      "id": "src_lib_jsoninput",
+      "label": "JsonInput",
+      "degree": 11
+    },
+    {
       "id": "src_lib_read_export",
       "label": "read_export()",
-      "degree": 10
+      "degree": 11
     },
     {
-      "id": "src_lib_recipe",
-      "label": "Recipe",
-      "degree": 10
-    },
-    {
-      "id": "package_scripts",
-      "label": "scripts",
-      "degree": 10
-    },
-    {
-      "id": "site_src_main_render",
-      "label": "render()",
-      "degree": 9
+      "id": "src_lib_collect_input_file",
+      "label": "collect_input_file()",
+      "degree": 11
     }
   ],
   "surprises": [
@@ -291,7 +301,7 @@
       ],
       "confidence": "EXTRACTED",
       "relation": "references",
-      "why": "bridges separate communities"
+      "why": "cross-file semantic connection"
     },
     {
       "source": "parse_export()",
@@ -302,7 +312,7 @@
       ],
       "confidence": "EXTRACTED",
       "relation": "references",
-      "why": "bridges separate communities"
+      "why": "cross-file semantic connection"
     }
   ],
   "tokens": {
