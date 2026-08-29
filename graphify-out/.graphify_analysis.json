@@ -1,6 +1,65 @@
 {
   "communities": {
     "0": [
+      "btreeset",
+      "option",
+      "path",
+      "src_lib",
+      "src_lib_checkresult",
+      "src_lib_collect_json",
+      "src_lib_collision",
+      "src_lib_escape_md",
+      "src_lib_export_spec_rejects_unknown_systems",
+      "src_lib_extract_ingredient",
+      "src_lib_extract_instruction",
+      "src_lib_extract_label",
+      "src_lib_find_collisions",
+      "src_lib_imagecheck",
+      "src_lib_inspect_image",
+      "src_lib_jaccard",
+      "src_lib_known_fields",
+      "src_lib_normalize",
+      "src_lib_parse_recipe",
+      "src_lib_read_export",
+      "src_lib_recipe",
+      "src_lib_render_report",
+      "src_lib_restricted_image",
+      "src_lib_string_at",
+      "src_lib_strings_at",
+      "src_lib_summary",
+      "src_lib_tokens",
+      "src_lib_warning",
+      "src_lib_write_parent",
+      "string",
+      "value",
+      "vec"
+    ],
+    "1": [
+      "display",
+      "err",
+      "formatter",
+      "fromstr",
+      "pathbuf",
+      "result",
+      "self",
+      "src_lib_checkoptions",
+      "src_lib_documented_example_finds_collision_and_review_items",
+      "src_lib_empty_destination_produces_a_useful_zero_collision_report",
+      "src_lib_empty_export_has_a_next_step",
+      "src_lib_exportspec",
+      "src_lib_exportspec_from_str",
+      "src_lib_image_hash_can_identify_same_image",
+      "src_lib_image_paths_cannot_escape_the_selected_export_folder",
+      "src_lib_outputs",
+      "src_lib_recipesystem",
+      "src_lib_recipesystem_fmt",
+      "src_lib_recipesystem_from_str",
+      "src_lib_run_check",
+      "src_lib_run_demo",
+      "src_lib_validate_export",
+      "src_main_main"
+    ],
+    "2": [
       "site_src_main",
       "site_src_main_acceptlicensefromurl",
       "site_src_main_bindactions",
@@ -25,14 +84,30 @@
       "site_src_main_terminal",
       "site_src_main_verifylicense"
     ],
-    "1": [
-      "axe_core_playwright",
+    "3": [
+      "ref_dom",
+      "ref_dom_iterable",
+      "ref_es2022",
+      "ref_playwright_config_ts",
+      "ref_site_src",
+      "ref_tests",
+      "tsconfig",
+      "tsconfig_compileroptions",
+      "tsconfig_compileroptions_allowimportingtsextensions",
+      "tsconfig_compileroptions_lib",
+      "tsconfig_compileroptions_module",
+      "tsconfig_compileroptions_moduledetection",
+      "tsconfig_compileroptions_moduleresolution",
+      "tsconfig_compileroptions_noemit",
+      "tsconfig_compileroptions_skiplibcheck",
+      "tsconfig_compileroptions_strict",
+      "tsconfig_compileroptions_target",
+      "tsconfig_compileroptions_usedefineforclassfields",
+      "tsconfig_compileroptions_verbatimmodulesyntax",
+      "tsconfig_include"
+    ],
+    "4": [
       "package",
-      "package_devdependencies",
-      "package_devdependencies_axe_core_playwright",
-      "package_devdependencies_playwright_test",
-      "package_devdependencies_typescript",
-      "package_devdependencies_vite",
       "package_name",
       "package_private",
       "package_scripts",
@@ -40,134 +115,100 @@
       "package_scripts_build_cli",
       "package_scripts_build_site",
       "package_scripts_dev",
+      "package_scripts_lint",
       "package_scripts_preview",
       "package_scripts_test",
       "package_scripts_test_browser",
+      "package_scripts_typecheck",
       "package_type",
-      "package_version",
+      "package_version"
+    ],
+    "5": [
+      "axe_core_playwright",
+      "package_devdependencies",
+      "package_devdependencies_axe_core_playwright",
+      "package_devdependencies_playwright_test",
+      "package_devdependencies_types_node",
+      "package_devdependencies_typescript",
+      "package_devdependencies_vite",
       "playwright_test",
+      "types_node",
       "typescript",
       "vite"
     ],
-    "2": [
-      "display",
-      "err",
-      "formatter",
-      "fromstr",
-      "self",
-      "src_lib_checkoptions",
-      "src_lib_empty_destination_produces_a_useful_zero_collision_report",
-      "src_lib_empty_export_has_a_next_step",
-      "src_lib_exportspec",
-      "src_lib_exportspec_from_str",
-      "src_lib_known_fields",
-      "src_lib_recipesystem",
-      "src_lib_recipesystem_fmt",
-      "src_lib_recipesystem_from_str",
-      "src_lib_rs_pathbuf",
-      "src_lib_rs_result",
-      "src_lib_run_check",
-      "src_lib_validate_export",
-      "src_lib_write_parent"
-    ],
-    "3": [
-      "path",
-      "src_lib",
-      "src_lib_collect_json",
-      "src_lib_documented_example_finds_collision_and_review_items",
-      "src_lib_export_spec_rejects_unknown_systems",
-      "src_lib_image_hash_can_identify_same_image",
-      "src_lib_imagecheck",
-      "src_lib_inspect_image",
-      "src_lib_run_demo",
-      "src_lib_summary"
-    ],
-    "4": [
-      "option",
-      "src_lib_extract_ingredient",
-      "src_lib_extract_instruction",
-      "src_lib_extract_label",
-      "src_lib_parse_recipe",
-      "src_lib_string_at",
-      "src_lib_strings_at",
-      "value"
-    ],
-    "5": [
-      "src_lib_checkresult",
-      "src_lib_collision",
-      "src_lib_find_collisions",
-      "src_lib_outputs",
-      "src_lib_read_export",
-      "src_lib_recipe",
-      "src_lib_warning",
-      "vec"
-    ],
     "6": [
-      "src_main",
-      "src_main_cli",
-      "src_main_command",
-      "src_main_main",
-      "src_main_parse_export",
-      "src_main_rs_pathbuf",
-      "src_main_rs_result",
-      "src_main_rs_string"
-    ],
-    "7": [
-      "btreeset",
-      "src_lib_escape_md",
-      "src_lib_jaccard",
-      "src_lib_normalize",
-      "src_lib_render_report",
-      "src_lib_rs_string",
-      "src_lib_tokens"
-    ],
-    "8": [
       "scripts_copy_404",
       "scripts_copy_404_config",
       "scripts_copy_404_configurl",
       "scripts_copy_404_digest",
       "scripts_copy_404_indexurl",
-      "scripts_copy_404_outputroot"
+      "scripts_copy_404_outputroot",
+      "scripts_copy_404_versionedassets"
     ],
-    "9": [
+    "7": [
+      "src_main",
+      "src_main_cli",
+      "src_main_command",
+      "src_main_parse_export",
+      "src_main_rs_pathbuf",
+      "src_main_rs_result",
+      "src_main_rs_string"
+    ],
+    "8": [
       "site_public_sw",
       "site_public_sw_shell"
     ],
-    "10": [
+    "9": [
       "pkg_recipe_library_move_check"
     ],
-    "11": [
+    "10": [
       "playwright_config"
     ],
+    "11": [
+      "src_lib_rs_pathbuf"
+    ],
     "12": [
+      "src_lib_rs_result"
+    ],
+    "13": [
+      "src_lib_rs_string"
+    ],
+    "14": [
       "tests_site_spec"
     ]
   },
   "cohesion": {
-    "0": 0.2015810276679842,
-    "1": 0.09090909090909091,
-    "2": 0.17543859649122806,
-    "3": 0.3111111111111111,
-    "4": 0.6071428571428571,
-    "5": 0.4642857142857143,
-    "6": 0.32142857142857145,
-    "7": 0.3333333333333333,
-    "8": 0.3333333333333333,
+    "0": 0.20362903225806453,
+    "1": 0.1422924901185771,
+    "2": 0.2015810276679842,
+    "3": 0.1,
+    "4": 0.13333333333333333,
+    "5": 0.18181818181818182,
+    "6": 0.2857142857142857,
+    "7": 0.38095238095238093,
+    "8": 1.0,
     "9": 1.0,
     "10": 1.0,
     "11": 1.0,
-    "12": 1.0
+    "12": 1.0,
+    "13": 1.0,
+    "14": 1.0
   },
   "gods": [
     {
       "id": "src_lib_run_check",
       "label": "run_check()",
-      "degree": 15
+      "degree": 16
     },
     {
       "id": "src_lib_parse_recipe",
       "label": "parse_recipe()",
       "degree": 13
+    },
+    {
+      "id": "tsconfig_compileroptions",
+      "label": "compilerOptions",
+      "degree": 12
     },
     {
       "id": "src_lib_exportspec",
@@ -180,13 +221,18 @@
       "degree": 11
     },
     {
-      "id": "src_lib_read_export",
-      "label": "read_export()",
+      "id": "package_scripts",
+      "label": "scripts",
       "degree": 10
     },
     {
       "id": "src_lib_recipe",
       "label": "Recipe",
+      "degree": 10
+    },
+    {
+      "id": "src_lib_read_export",
+      "label": "read_export()",
       "degree": 10
     },
     {
@@ -198,41 +244,9 @@
       "id": "src_lib_recipesystem",
       "label": "RecipeSystem",
       "degree": 9
-    },
-    {
-      "id": "src_lib_run_demo",
-      "label": "run_demo()",
-      "degree": 9
-    },
-    {
-      "id": "site_src_main_homepage",
-      "label": "homePage()",
-      "degree": 8
     }
   ],
   "surprises": [
-    {
-      "source": "main()",
-      "target": "run_check()",
-      "source_files": [
-        "src/main.rs",
-        "src/lib.rs"
-      ],
-      "confidence": "INFERRED",
-      "relation": "calls",
-      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
-    },
-    {
-      "source": "main()",
-      "target": "run_demo()",
-      "source_files": [
-        "src/main.rs",
-        "src/lib.rs"
-      ],
-      "confidence": "INFERRED",
-      "relation": "calls",
-      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
-    },
     {
       "source": "Command",
       "target": "ExportSpec",
@@ -243,6 +257,28 @@
       "confidence": "EXTRACTED",
       "relation": "references",
       "why": "bridges separate communities"
+    },
+    {
+      "source": "main()",
+      "target": "run_check()",
+      "source_files": [
+        "src/main.rs",
+        "src/lib.rs"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source"
+    },
+    {
+      "source": "main()",
+      "target": "run_demo()",
+      "source_files": [
+        "src/main.rs",
+        "src/lib.rs"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source"
     },
     {
       "source": "parse_export()",
