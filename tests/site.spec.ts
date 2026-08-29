@@ -727,7 +727,7 @@ test("reduced motion removes the terminal recording animation", async ({ page })
 test("release output has dedicated routes, legal links, a real 404, and cache policy", async () => {
   for (const output of ["index.html", "demo/index.html", "privacy/index.html", "terms/index.html", "404.html"]) {
     const html = readFileSync(join(process.cwd(), "dist/site", output), "utf8");
-    expect(html).toContain("Recipe Move Check");
+    expect(html).toContain("Recipe Library Move Check");
     expect(html).toContain('rel="canonical"');
   }
   const config = JSON.parse(readFileSync(join(process.cwd(), "dist/site/staticwebapp.config.json"), "utf8"));
