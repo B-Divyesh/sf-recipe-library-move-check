@@ -215,18 +215,18 @@
       "degree": 12
     },
     {
-      "id": "src_lib_exportspec",
-      "label": "ExportSpec",
-      "degree": 11
-    },
-    {
       "id": "src_lib_checkresult",
       "label": "CheckResult",
       "degree": 11
     },
     {
-      "id": "package_scripts",
-      "label": "scripts",
+      "id": "src_lib_exportspec",
+      "label": "ExportSpec",
+      "degree": 11
+    },
+    {
+      "id": "src_lib_read_export",
+      "label": "read_export()",
       "degree": 10
     },
     {
@@ -235,8 +235,8 @@
       "degree": 10
     },
     {
-      "id": "src_lib_read_export",
-      "label": "read_export()",
+      "id": "package_scripts",
+      "label": "scripts",
       "degree": 10
     },
     {
