@@ -1,44 +1,100 @@
 [
   {
     "id": "sample-findings",
-    "claim": "The sample finds one collision, one missing image, and three fields to review.",
-    "where": "landing terminal and demo result ledger",
+    "claim": "The bundled sample finds one possible duplicate, one missing image, three fields to review, and two ownership reviews.",
+    "where": "landing recording, demo result ledger, CLI demo",
     "test": "npm test -- --grep @claim:sample-findings",
-    "sandbox": "fresh browser context at /demo with the fixed fictional sample"
+    "sandbox": "fresh browser context at /?demo=1; assert every displayed count, evidence reason, missing path, and ownership reminder"
   },
   {
     "id": "demo-privacy",
-    "claim": "Sample data is not sent away or saved with real data.",
-    "where": "demo banner and privacy page",
+    "claim": "The browser sample uses an isolated demo key, sends no sample recipe data away, and discards its state when leaving.",
+    "where": "demo banner, privacy page, README",
     "test": "npm test -- --grep @claim:demo-privacy",
-    "sandbox": "fresh browser context; capture every request and inspect localStorage keys"
+    "sandbox": "fresh browser context at /?demo=1; capture every request and storage key through replay, reset, and Start for real"
   },
   {
-    "id": "cli-output",
-    "claim": "The CLI reads Mealie and Tandoor folders and writes a checklist plus neutral JSON inventory.",
-    "where": "landing page, README, CLI help",
-    "test": "npm test -- --grep @claim:cli-output",
-    "sandbox": "recipe-move-check demo in a fresh temporary folder; inspect both written outputs"
+    "id": "cli-capabilities",
+    "claim": "The CLI inventories recipes, hashes available in-folder images, finds possible duplicates, lists fields to review, and writes a checklist.",
+    "where": "landing page, README, CLI output",
+    "test": "npm test -- --grep @claim:cli-capabilities",
+    "sandbox": "run the real bundled CLI demo; inspect its JSON inventory and Markdown checklist"
+  },
+  {
+    "id": "free-cli",
+    "claim": "The MIT-licensed CLI is free and runs without an account, license, or reachable network.",
+    "where": "landing facts, install section, terms, README",
+    "test": "npm test -- --grep @claim:free-cli",
+    "sandbox": "build the binary, provide unreachable proxy endpoints and no product credentials, then require both outputs"
+  },
+  {
+    "id": "demo-is-real-cli",
+    "claim": "The CLI demo runs the same checker on the shipped sample used by the recorded web demo.",
+    "where": "recorded CLI sample, README, demo documentation",
+    "test": "npm test -- --grep @claim:demo-is-real-cli",
+    "sandbox": "compare normalized demo output with check output on examples/ and validate the SVG recording source data"
+  },
+  {
+    "id": "nested-export-support",
+    "claim": "The checker reads recipe JSON files and local images inside nested export folders.",
+    "where": "README",
+    "test": "npm test -- --grep @claim:nested-export-support",
+    "sandbox": "check the nested shipped Mealie and Tandoor sample folders and inspect source paths and image status"
   },
   {
     "id": "cli-local-only",
-    "claim": "The checker reads selected export folders and writes only the report and inventory paths you name.",
-    "where": "landing privacy section, privacy page, README",
+    "claim": "The checker leaves both exports byte-identical and writes only the named checklist and inventory.",
+    "where": "landing scope, privacy page, README",
     "test": "npm test -- --grep @claim:cli-local-only",
-    "sandbox": "fresh temporary source, destination, and output folders; run check and inspect every changed path"
+    "sandbox": "hash every source and destination file plus the parent sandbox before and after; assert only two named outputs change"
+  },
+  {
+    "id": "exit-codes",
+    "claim": "Completed checks return exit code 0; invalid arguments and unreadable folders return a non-zero code.",
+    "where": "README",
+    "test": "npm test -- --grep @claim:exit-codes",
+    "sandbox": "run the binary with sample findings, an invalid system, and a missing export folder"
+  },
+  {
+    "id": "supported-fields",
+    "claim": "The JSON inventory maps the documented Mealie and Tandoor names, ingredients, instructions, tags, servings, and image paths.",
+    "where": "README supported export fields",
+    "test": "npm test -- --grep @claim:supported-fields",
+    "sandbox": "run the shipped two-format fixture and assert every documented field in the resulting inventory"
+  },
+  {
+    "id": "unknown-fields",
+    "claim": "The JSON inventory keeps unknown field names and lists them in the checklist.",
+    "where": "README supported export fields",
+    "test": "npm test -- --grep @claim:unknown-fields",
+    "sandbox": "run the sample with rating, notes, and household ownership fields; inspect both output files"
+  },
+  {
+    "id": "license-privacy",
+    "claim": "Planning-pack verification sends only the license token to the Sociobot verification endpoint.",
+    "where": "privacy page and README",
+    "test": "npm test -- --grep @claim:license-privacy",
+    "sandbox": "fresh browser with a recorded verification response; inspect exact URL, query keys, method, body, referrer, and storage"
   },
   {
     "id": "offline-demo",
-    "claim": "The sample demo works offline after the first visit.",
+    "claim": "The isolated sample reloads offline after its first visit.",
     "where": "demo documentation",
     "test": "npm test -- --grep @claim:offline-demo",
-    "sandbox": "fresh browser context; visit /demo, wait for service worker, set offline, reload"
+    "sandbox": "fresh browser context; visit /?demo=1, wait for service-worker control, set offline, and reload"
   },
   {
     "id": "planning-pack",
-    "claim": "The optional planning pack is $19 once, and a valid license downloads the family planning worksheet.",
+    "claim": "The optional planning pack costs $19 once and includes an ownership worksheet plus move-day notes.",
     "where": "paid section and terms",
     "test": "npm test -- --grep @claim:planning-pack",
-    "sandbox": "fresh browser context with a recorded valid Sociobot verification response"
+    "sandbox": "fresh browser with a recorded valid Sociobot response; download and inspect the Markdown contents"
+  },
+  {
+    "id": "crate-package",
+    "claim": "The published crate contains only the consumer CLI, documentation, license, changelog, and shipped examples.",
+    "where": "README install and package",
+    "test": "npm test -- --grep @claim:crate-package",
+    "sandbox": "list a fresh cargo package and reject repository analysis, website, browser-test, and factory files"
   }
 ]

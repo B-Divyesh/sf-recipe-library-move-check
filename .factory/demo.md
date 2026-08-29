@@ -2,8 +2,9 @@
 
 ## Browser
 
-- URL: `https://recipe-library-move-check.sociobot.in/demo`
-- Local URL: `http://127.0.0.1:5173/demo` after `npm run dev`
+- One-click URL: `https://recipe-library-move-check.sociobot.in/?demo=1`
+- Alternate route: `https://recipe-library-move-check.sociobot.in/demo`
+- Local URL: `http://127.0.0.1:5173/?demo=1` after `npm run dev`
 - The page opens directly on completed findings for two fictional Mealie recipes and two fictional Tandoor recipes.
 - **Reset demo** replaces the screen with the fixed starting state.
 - **Start for real** leaves demo mode and opens the local install instructions.
@@ -16,6 +17,8 @@
 - The command makes a new temporary directory containing two export folders, the Markdown report, and the JSON inventory.
 - It prints the exact sandbox path. Delete that directory to reset or remove the demo.
 - The sample source includes Lemon Pasta and Red Lentil Soup. The destination includes Lemon Pasta and Sunday Granola.
-- The result contains one collision, one missing image, three field review items, and two ownership reviews.
+- The result contains one possible duplicate, one missing image, three field review items, and two ownership reviews.
+- `site/public/terminal-recording.svg` is the self-hosted recording. Its source data is `examples/demo-recording.json`.
+- The `demo-is-real-cli` claim test compares this data with both CLI entry points on every test run.
 
 Both entry points use fixed sample content. The browser demo sends no sample recipe data to another origin.

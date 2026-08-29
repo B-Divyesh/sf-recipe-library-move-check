@@ -6,6 +6,7 @@
     { "route": "/og-image.a7d4c2.webp", "headers": { "Cache-Control": "public, max-age=31536000, immutable" } },
     { "route": "/favicon.4bc1a9.svg", "headers": { "Cache-Control": "public, max-age=31536000, immutable" } },
     { "route": "/apple-touch-icon.17b9e8.png", "headers": { "Cache-Control": "public, max-age=31536000, immutable" } },
+    { "route": "/terminal-recording.4a32d1.svg", "headers": { "Cache-Control": "public, max-age=31536000, immutable" } },
     { "route": "/sw.js", "headers": { "Cache-Control": "no-cache" } },
     { "route": "/robots.txt", "headers": { "Cache-Control": "public, max-age=3600" } },
     { "route": "/sitemap.xml", "headers": { "Cache-Control": "public, max-age=3600" } }

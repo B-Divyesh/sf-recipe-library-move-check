@@ -25,37 +25,31 @@ function footer(): string {
   return `<footer class="site-footer"><div class="shell footer-grid">
     <p>Check a recipe move before you import.</p>
     <nav aria-label="Footer navigation"><a href="/privacy" data-link>Privacy</a><a href="/terms" data-link>Terms</a><a href="https://sociobot.in" rel="noreferrer">Built by Param Factory <span class="sr-only">(external site)</span></a></nav>
-    <p class="build">Version 0.1.0 · build 2026.08.28</p>
+    <p class="build">Version 0.1.0 · build 2026.08.29</p>
   </div></footer>`;
 }
 
 function facts(): string {
   return `<ul class="facts" aria-label="Product facts">
-    <li><span aria-hidden="true">⌂</span> Reads the folders you select.</li>
-    <li><span aria-hidden="true">×</span> Writes a checklist and neutral JSON.</li>
+    <li><span aria-hidden="true">⌂</span> Runs locally on the folders you select.</li>
+    <li><span aria-hidden="true">×</span> Writes a checklist and JSON inventory.</li>
     <li><span aria-hidden="true">$</span> The CLI is free. The planning pack costs $19 once.</li>
   </ul>`;
 }
 
 function terminal(compact = false): string {
-  return `<section class="terminal ${compact ? "terminal-compact" : ""}" aria-labelledby="terminal-title">
-    <div class="terminal-bar"><span aria-hidden="true">● ● ●</span><h2 id="terminal-title">Sample terminal run</h2><button class="terminal-replay" type="button">Replay run</button></div>
-    <div class="terminal-body" tabindex="0" aria-label="Terminal transcript">
-      <p><span class="prompt">$</span> recipe-move-check demo</p>
-      <div class="terminal-output">
-        <p>Demo — sample data, nothing is saved to your libraries.</p>
-        <p>Found <strong>1 collision</strong>, <strong>1 missing image</strong>, and <strong>3 field review items</strong>.</p>
-        <p>Review the demo report: /tmp/recipe-move-check-demo/move-check.md</p>
-      </div>
-    </div>
-  </section>`;
+  return `<figure class="terminal ${compact ? "terminal-compact" : ""}" aria-labelledby="terminal-title">
+    <div class="terminal-bar"><span aria-hidden="true">● ● ●</span><h2 id="terminal-title">Recorded CLI sample</h2><button class="terminal-replay" type="button">Replay sample run</button></div>
+    <img class="terminal-recording" src="/terminal-recording.4a32d1.svg" width="960" height="430" alt="Recording of the real CLI finding one possible duplicate, one missing image, and three fields to review.">
+    <figcaption>Recorded from <code>recipe-move-check demo --json</code> using the bundled sample.</figcaption>
+  </figure>`;
 }
 
 function resultLedger(): string {
   return `<section class="ledger" aria-labelledby="ledger-title">
-    <div class="ledger-heading"><p class="scribble">sample findings / 28 Aug</p><h2 id="ledger-title">What the check catches</h2></div>
+    <div class="ledger-heading"><p class="scribble">sample findings / 29 Aug</p><h2 id="ledger-title">What the check catches</h2></div>
     <div class="tally" aria-label="Sample result totals">
-      <div><strong>1</strong><span>possible collision</span></div><div><strong>1</strong><span>missing image</span></div><div><strong>3</strong><span>fields to review</span></div>
+      <div><strong>1</strong><span>possible duplicate</span></div><div><strong>1</strong><span>missing image</span></div><div><strong>3</strong><span>fields to review</span></div>
     </div>
     <div class="evidence-list">
       <article><span class="proof proof-red" aria-hidden="true">!</span><div><h3>Lemon Pasta may already exist</h3><p>Same name, ingredient list, and image hash.</p></div><span class="confidence">high</span></article>
@@ -67,10 +61,10 @@ function resultLedger(): string {
 
 function paidSection(): string {
   return `<section class="paid sheet shell" aria-labelledby="paid-title">
-    <div><p class="eyebrow">Optional planning pack · $19 once</p><h2 id="paid-title">Give every family member a job</h2><p>Print an ownership worksheet and move-day notes. The checker, report, and JSON inventory stay free.</p></div>
+    <div><p class="eyebrow">Optional planning pack · $19 once</p><h2 id="paid-title">Optional family planning pack</h2><p>Download a printable ownership worksheet and move-day notes. The CLI, checklist, and JSON inventory remain free.</p></div>
     <div class="paid-actions">
       <a class="button button-dark" href="${API}/products/${SLUG}/checkout">Buy the planning pack</a>
-      <button class="text-button" id="restore-toggle" type="button">Have a license? Paste it</button>
+      <button class="text-button" id="restore-toggle" type="button">Enter license token</button>
       <form id="license-form" class="license-form" hidden><label for="license">License token</label><div><input id="license" name="license" autocomplete="off" required><button class="button button-small" type="submit">Verify license</button></div></form>
       <p id="license-status" class="small" aria-live="polite">Sociobot is the merchant of record. Refunds are handled there.</p>
       <button id="download-pack" class="button button-paper" type="button" hidden>Download planning pack</button>
@@ -81,19 +75,19 @@ function paidSection(): string {
 function homePage(): string {
   return `${header()}<main id="main">
     <section class="hero shell">
-      <div class="hero-copy"><p class="eyebrow">Mealie ↔ Tandoor preflight</p><h1 tabindex="-1">Check your recipe move before importing</h1><p class="lede">For households moving between Mealie and Tandoor who need a safe plan for the family library.</p>
-        <div class="hero-actions"><a class="button" href="/demo" data-link>Try it with sample data</a><span>See a completed preflight in one click.</span></div>${facts()}
+      <div class="hero-copy"><p class="eyebrow">Mealie ↔ Tandoor check</p><h1 tabindex="-1">Check your recipe move before importing</h1><p class="lede">For households moving between Mealie and Tandoor who need a checklist before importing the family library.</p>
+        <div class="hero-actions"><a class="button" href="/?demo=1" data-link>Try it with sample data</a><span>See a completed check in one click.</span></div>${facts()}
       </div>
       <div class="hero-visual"><div class="tape" aria-hidden="true"></div><img src="/notebook-migration.98e3f6.webp" width="1280" height="854" alt="A lab notebook compares two recipe cards under a magnifying glass." fetchpriority="high">${terminal(true)}</div>
     </section>
     <section class="preview shell" aria-label="Live product preview">${resultLedger()}</section>
-    <section class="how shell" aria-labelledby="how-title"><p class="scribble">method / three steps</p><h2 id="how-title">Check before touching the destination</h2><ol>
+    <section class="how shell" aria-labelledby="how-title"><h2 id="how-title">How to check two recipe libraries</h2><ol>
       <li><span>01</span><div><h3>Export both libraries</h3><p>Make a Mealie or Tandoor export from each server.</p></div></li>
       <li><span>02</span><div><h3>Run one local command</h3><p>Point the checker at the moving and existing folders.</p></div></li>
-      <li><span>03</span><div><h3>Review the written checklist</h3><p>Resolve collisions, images, fields, owners, and family access.</p></div></li>
+      <li><span>03</span><div><h3>Review the written checklist</h3><p>Review possible duplicates, images, fields, owners, and family access.</p></div></li>
     </ol></section>
-    <section id="install" class="install dark-sheet" aria-labelledby="install-title"><div class="shell install-grid"><div><p class="eyebrow">Run it locally</p><h2 id="install-title">Install the checker</h2><p>Rust 1.80 or newer is required.</p></div><div class="code-block"><button type="button" class="copy-command" data-copy="cargo install --git https://github.com/B-Divyesh/sf-recipe-library-move-check">Copy install command</button><code>cargo install --git https://github.com/<wbr>B-Divyesh/<wbr>sf-recipe-library-move-check</code></div></div></section>
-    <section class="limits shell" aria-labelledby="limits-title"><div><p class="scribble">scope boundary</p><h2 id="limits-title">Your recipes stay yours</h2></div><div><p>The CLI reads the folders you select and writes the report and inventory paths you name.</p><p>It does not move recipes or copy paid content.</p><p>Delete the report and inventory to remove its output.</p><a href="/privacy" data-link>Read the privacy details</a></div></section>
+    <section id="install" class="install dark-sheet" aria-labelledby="install-title"><div class="shell install-grid"><div><p class="eyebrow">Run it locally</p><h2 id="install-title">Install the checker</h2><p>Install the free CLI with Cargo.</p></div><div class="code-block"><button type="button" class="copy-command" data-copy="cargo install --git https://github.com/B-Divyesh/sf-recipe-library-move-check">Copy install command</button><code>cargo install --git https://github.com/<wbr>B-Divyesh/<wbr>sf-recipe-library-move-check</code></div></div></section>
+    <section class="limits shell" aria-labelledby="limits-title"><div><h2 id="limits-title">What the checker reads and writes</h2></div><div><p>The CLI reads the folders you select. It writes the checklist and JSON inventory paths you name.</p><p>It does not change either export.</p><p>Delete the checklist and inventory to remove its output.</p><a href="/privacy" data-link>Read the privacy details</a></div></section>
     ${paidSection()}
   </main>${footer()}`;
 }
@@ -108,8 +102,8 @@ function demoPage(): string {
 
 function policyPage(kind: "privacy" | "terms"): string {
   const privacy = kind === "privacy";
-  return `${header()}<main id="main" class="policy shell"><p class="eyebrow">Last updated 28 August 2026</p><h1 tabindex="-1">${privacy ? "Privacy in plain words" : "Terms for using this checker"}</h1>
-    ${privacy ? `<section><h2>The CLI uses selected folders</h2><p>The checker reads the export folders you choose. It writes the report and inventory paths you choose.</p></section><section><h2>The sample does not use your recipes</h2><p>The site demo uses fixed fictional recipes. Demo state uses a separate <code>demo:</code> browser key. Resetting or leaving the demo removes that key.</p></section><section><h2>License checks</h2><p>If you buy the optional planning pack, the site stores your license token and a dated verdict in this browser. It sends only that token to Sociobot for verification. Delete the site’s local storage to remove both values.</p></section><section><h2>Site logs</h2><p>The host may keep standard security logs.</p></section>` : `<section><h2>Use it as a preflight</h2><p>Similarity scores are review hints. They do not prove that two recipes are the same. Keep backups and test a small import first.</p></section><section><h2>Your content remains yours</h2><p>You are responsible for the recipes and images you inspect or move. An image hash is metadata. It does not grant a right to copy an image.</p></section><section><h2>The free checker</h2><p>The CLI, Markdown report, and JSON inventory are provided under the MIT License. They come without a warranty.</p></section><section><h2>The $19 planning pack</h2><p>The planning pack is a one-time purchase. Sociobot and Dodo are the merchant of record. A refund revokes the license. The free checker remains available.</p></section>`}
+  return `${header()}<main id="main" class="policy shell"><p class="eyebrow">Last updated 29 August 2026</p><h1 tabindex="-1">${privacy ? "Privacy in plain words" : "Terms for using this checker"}</h1>
+    ${privacy ? `<section><h2>The CLI uses selected folders</h2><p>The checker reads the export folders you choose. It writes the checklist and inventory paths you choose.</p></section><section><h2>The sample does not use your recipes</h2><p>The site demo uses fixed fictional recipes. Demo state uses a separate <code>demo:</code> browser key. Resetting or leaving the demo removes that key.</p></section><section><h2>License checks</h2><p>If you buy the optional planning pack, the site stores your license token and a dated verdict in this browser.</p><p>It sends only that token to Sociobot for verification. Delete the site’s local storage to remove both values.</p></section><section><h2>Site logs</h2><p>The host may keep standard security logs.</p></section>` : `<section><h2>Use it as a check</h2><p>Similarity scores are review hints. They do not prove that two recipes are the same. Keep backups and test a small import first.</p></section><section><h2>Your content remains yours</h2><p>You are responsible for the recipes and images you inspect or move. An image hash is metadata. It does not grant a right to copy an image.</p></section><section><h2>The free checker</h2><p>The CLI, Markdown checklist, and JSON inventory are provided under the MIT License. They come without a warranty.</p></section><section><h2>The $19 planning pack</h2><p>The planning pack is a one-time purchase. Sociobot and Dodo are the merchant of record.</p><p>A refund revokes the license. The free checker remains available.</p></section>`}
   </main>${footer()}`;
 }
 
@@ -118,6 +112,7 @@ function notFoundPage(): string {
 }
 
 function pageFor(path: string): Page {
+  if ((path === "/" || path === "") && new URLSearchParams(location.search).get("demo") === "1") return "demo";
   if (path === "/" || path === "") return "home";
   if (path === "/demo") return "demo";
   if (path === "/privacy") return "privacy";
@@ -127,15 +122,19 @@ function pageFor(path: string): Page {
 
 function metadata(page: Page): void {
   const meta: Record<Page, [string, string]> = {
-    home: ["Recipe Move Check — Check before you import", "Check Mealie and Tandoor exports for duplicates, missing images, ownership gaps, and fields that need review."],
-    demo: ["Demo — Recipe Library Move Check", "Review a sample Mealie to Tandoor move with ready-made collision and missing-image findings."],
+    home: ["Recipe Library Move Check — Check before importing", "Check Mealie and Tandoor exports for possible duplicates, missing images, ownership gaps, and fields to review."],
+    demo: ["Demo — Recipe Library Move Check", "Review a sample Mealie to Tandoor move with a possible duplicate and a missing-image finding."],
     privacy: ["Privacy — Recipe Library Move Check", "See what the local checker reads, what it writes, and how optional license verification works."],
     terms: ["Terms — Recipe Library Move Check", "Terms for the free recipe move checker and optional household planning pack."],
     "not-found": ["Page not found — Recipe Move Check", "Return to Recipe Library Move Check."],
   };
-  document.title = meta[page][0];
-  document.querySelector<HTMLMetaElement>('meta[name="description"]')!.content = meta[page][1];
-  document.querySelector<HTMLLinkElement>('link[rel="canonical"]')!.href = `https://recipe-library-move-check.sociobot.in${location.pathname}`;
+  const [title, description] = meta[page];
+  const canonicalPath = page === "demo" ? "/demo" : page === "not-found" ? "/404" : location.pathname;
+  document.title = title;
+  document.querySelector<HTMLMetaElement>('meta[name="description"]')!.content = description;
+  document.querySelector<HTMLLinkElement>('link[rel="canonical"]')!.href = `https://recipe-library-move-check.sociobot.in${canonicalPath}`;
+  for (const selector of ['meta[property="og:title"]', 'meta[name="twitter:title"]']) document.querySelector<HTMLMetaElement>(selector)!.content = title;
+  for (const selector of ['meta[property="og:description"]', 'meta[name="twitter:description"]']) document.querySelector<HTMLMetaElement>(selector)!.content = description;
 }
 
 function render(push = false): void {
@@ -165,9 +164,9 @@ function bindActions(): void {
     event.preventDefault(); navigate(link.href);
   }));
   document.querySelectorAll<HTMLButtonElement>(".terminal-replay").forEach((button) => button.addEventListener("click", () => {
-    const output = button.closest(".terminal")!.querySelector<HTMLElement>(".terminal-output")!;
-    output.classList.remove("is-drawn"); requestAnimationFrame(() => output.classList.add("is-drawn"));
-    button.textContent = "Run replayed";
+    const recording = button.closest(".terminal")!.querySelector<HTMLImageElement>(".terminal-recording")!;
+    recording.src = `/terminal-recording.4a32d1.svg?replay=${Date.now()}`;
+    button.textContent = "Sample run replayed";
   }));
   document.querySelectorAll<HTMLButtonElement>(".copy-command").forEach((button) => button.addEventListener("click", async () => {
     await navigator.clipboard.writeText(button.dataset.copy!); button.textContent = "Install command copied";
@@ -175,7 +174,7 @@ function bindActions(): void {
   document.querySelector<HTMLButtonElement>("#reset-demo")?.addEventListener("click", () => {
     localStorage.setItem(DEMO_KEY, "reset"); render(); status.textContent = "Sample data reset";
   });
-  if (location.pathname === "/demo") localStorage.setItem(DEMO_KEY, "active");
+  if (pageFor(location.pathname) === "demo") localStorage.setItem(DEMO_KEY, "active");
   bindLicense();
 }
 

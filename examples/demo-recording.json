@@ -1,0 +1,23 @@
+{
+  "recorded_command": "recipe-move-check demo --json",
+  "recorded_on": "2026-08-29",
+  "source_system": "mealie",
+  "destination_system": "tandoor",
+  "summary": {
+    "source_recipes": 2,
+    "destination_recipes": 2,
+    "possible_duplicates": 1,
+    "missing_images": 1,
+    "unmapped_fields": 3,
+    "ownership_reviews": 2
+  },
+  "output_filenames": [
+    "move-check.md",
+    "neutral-inventory.json"
+  ],
+  "possible_duplicate_reasons": [
+    "same normalized name",
+    "similar ingredient list",
+    "same image hash"
+  ]
+}

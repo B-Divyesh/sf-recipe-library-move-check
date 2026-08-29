@@ -26,6 +26,7 @@ const versionedAssets = [
   ["og-image.webp", "og-image.a7d4c2.webp"],
   ["favicon.svg", "favicon.4bc1a9.svg"],
   ["apple-touch-icon.png", "apple-touch-icon.17b9e8.png"],
+  ["terminal-recording.svg", "terminal-recording.4a32d1.svg"],
 ];
 for (const [source, versioned] of versionedAssets) {
   await copyFile(new URL(source, outputRoot), new URL(versioned, outputRoot));

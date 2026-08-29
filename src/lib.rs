@@ -110,6 +110,7 @@ pub struct Warning {
 pub struct Summary {
     pub source_recipes: usize,
     pub destination_recipes: usize,
+    #[serde(rename = "possible_duplicates")]
     pub collisions: usize,
     pub missing_images: usize,
     pub unmapped_fields: usize,
@@ -127,6 +128,7 @@ pub struct CheckResult {
     pub source_system: RecipeSystem,
     pub destination_system: RecipeSystem,
     pub summary: Summary,
+    #[serde(rename = "possible_duplicates")]
     pub collisions: Vec<Collision>,
     pub source_recipes: Vec<Recipe>,
     pub destination_recipes: Vec<Recipe>,
@@ -149,7 +151,7 @@ pub fn run_check(options: CheckOptions) -> Result<CheckResult, String> {
     if destination_recipes.is_empty() {
         warnings.push(Warning {
             file: options.destination.folder.display().to_string(),
-            message: "the destination has no recipes; collision results are empty".into(),
+            message: "the destination has no recipes; possible duplicate results are empty".into(),
         });
     }
     let collisions = find_collisions(&source_recipes, &destination_recipes);
@@ -671,11 +673,11 @@ fn jaccard(a: &BTreeSet<String>, b: &BTreeSet<String>) -> f64 {
 }
 
 fn render_report(result: &CheckResult) -> String {
-    let mut text = format!("# Recipe library move checklist\n\nMove: **{} → {}**\n\n## Preflight summary\n\n- Source recipes: {}\n- Existing destination recipes: {}\n- Possible collisions: {}\n- Missing or external images: {}\n- Fields to review: {}\n- Ownership checks: {}\n\n", result.source_system, result.destination_system, result.summary.source_recipes, result.summary.destination_recipes, result.summary.collisions, result.summary.missing_images, result.summary.unmapped_fields, result.summary.ownership_reviews);
-    text.push_str("## Possible collisions\n\n");
+    let mut text = format!("# Recipe library move checklist\n\nMove: **{} → {}**\n\n## Check summary\n\n- Moving recipes: {}\n- Existing recipes: {}\n- Possible duplicates: {}\n- Missing or external images: {}\n- Fields to review: {}\n- Ownership checks: {}\n\n", result.source_system, result.destination_system, result.summary.source_recipes, result.summary.destination_recipes, result.summary.collisions, result.summary.missing_images, result.summary.unmapped_fields, result.summary.ownership_reviews);
+    text.push_str("## Possible duplicates\n\n");
     if result.collisions.is_empty() {
         text.push_str(
-            "No likely collisions were found. Review names manually before importing.\n\n",
+            "No possible duplicates were found. Review names manually before importing.\n\n",
         );
     } else {
         text.push_str("| Moving recipe | Existing recipe | Confidence | Evidence |\n| --- | --- | --- | --- |\n");
@@ -754,7 +756,7 @@ fn render_report(result: &CheckResult) -> String {
             ));
         }
     }
-    text.push_str("\n## Before importing\n\n- [ ] Back up both original export folders.\n- [ ] Resolve every possible collision above.\n- [ ] Locate missing images or accept that they will be absent.\n- [ ] Assign owners and household access.\n- [ ] Import a small test batch first.\n- [ ] Keep this report beside the untouched exports.\n\nThis checker reads exports only. Similarity is a review hint, not proof of a duplicate. Image hashes do not grant permission to copy content.\n");
+    text.push_str("\n## Before importing\n\n- [ ] Back up both original export folders.\n- [ ] Resolve every possible duplicate above.\n- [ ] Locate missing images or accept that they will be absent.\n- [ ] Assign owners and household access.\n- [ ] Import a small test batch first.\n- [ ] Keep this report beside the untouched exports.\n\nThis checker reads exports only. Similarity is a review hint, not proof of a duplicate. Image hashes do not grant permission to copy content.\n");
     text
 }
 
@@ -778,21 +780,34 @@ pub fn run_demo() -> Result<(CheckResult, PathBuf), String> {
     fs::create_dir_all(tandoor.join("recipes")).map_err(|e| e.to_string())?;
     fs::write(
         mealie.join("lemon-pasta/photo.jpg"),
-        b"sample-photo-same-content",
+        include_bytes!("../examples/mealie/lemon-pasta/photo.jpg"),
     )
     .map_err(|e| e.to_string())?;
     fs::write(
         tandoor.join("recipes/lemon.jpg"),
-        b"sample-photo-same-content",
+        include_bytes!("../examples/tandoor/recipes/lemon.jpg"),
     )
     .map_err(|e| e.to_string())?;
-    fs::write(mealie.join("lemon-pasta/recipe.json"), DEMO_MEALIE_PASTA)
-        .map_err(|e| e.to_string())?;
-    fs::write(mealie.join("lentil-soup/recipe.json"), DEMO_MEALIE_SOUP)
-        .map_err(|e| e.to_string())?;
-    fs::write(tandoor.join("recipes/lemon.json"), DEMO_TANDOOR_PASTA).map_err(|e| e.to_string())?;
-    fs::write(tandoor.join("recipes/granola.json"), DEMO_TANDOOR_GRANOLA)
-        .map_err(|e| e.to_string())?;
+    fs::write(
+        mealie.join("lemon-pasta/recipe.json"),
+        include_str!("../examples/mealie/lemon-pasta/recipe.json"),
+    )
+    .map_err(|e| e.to_string())?;
+    fs::write(
+        mealie.join("lentil-soup/recipe.json"),
+        include_str!("../examples/mealie/lentil-soup/recipe.json"),
+    )
+    .map_err(|e| e.to_string())?;
+    fs::write(
+        tandoor.join("recipes/lemon.json"),
+        include_str!("../examples/tandoor/recipes/lemon.json"),
+    )
+    .map_err(|e| e.to_string())?;
+    fs::write(
+        tandoor.join("recipes/granola.json"),
+        include_str!("../examples/tandoor/recipes/granola.json"),
+    )
+    .map_err(|e| e.to_string())?;
     let result = run_check(CheckOptions {
         source: ExportSpec {
             system: RecipeSystem::Mealie,
@@ -807,11 +822,6 @@ pub fn run_demo() -> Result<(CheckResult, PathBuf), String> {
     })?;
     Ok((result, root))
 }
-
-const DEMO_MEALIE_PASTA: &str = r#"{"name":"Lemon Pasta","recipeIngredient":["250 g spaghetti","1 lemon","2 tbsp olive oil"],"recipeInstructions":[{"text":"Boil pasta."},{"text":"Toss with lemon and oil."}],"tags":["weeknight"],"recipeYield":"4","image":"photo.jpg","household":{"name":"Rivera family"},"rating":5}"#;
-const DEMO_MEALIE_SOUP: &str = r#"{"name":"Red Lentil Soup","recipeIngredient":["200 g red lentils","1 onion","1 litre stock"],"recipeInstructions":["Simmer for 25 minutes."],"image":"missing.jpg","notes":"Mina likes extra lemon"}"#;
-const DEMO_TANDOOR_PASTA: &str = r#"{"name":"Lemon Pasta","ingredients":[{"amount":250,"unit":{"name":"g"},"food":{"name":"spaghetti"}},{"amount":1,"food":{"name":"lemon"}},{"amount":2,"unit":{"name":"tbsp"},"food":{"name":"olive oil"}}],"steps":[{"instruction":"Boil pasta, then toss with lemon and oil."}],"image":"lemon.jpg","owner":{"name":"Sam"}}"#;
-const DEMO_TANDOOR_GRANOLA: &str = r#"{"name":"Sunday Granola","ingredients":[{"amount":3,"unit":{"name":"cups"},"food":{"name":"oats"}}],"steps":[{"instruction":"Bake until crisp."}],"owner":{"name":"Sam"}}"#;
 
 #[cfg(test)]
 mod tests {

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="330" viewBox="0 0 960 330" role="img" aria-labelledby="title description">
+  <title id="title">Recorded recipe move check demo</title>
+  <desc id="description">The real command checks two Mealie recipes against two Tandoor recipes and writes a checklist and JSON inventory.</desc>
+  <style>
+    text { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 20px; fill: #d4dfdb; }
+    .command { fill: #f8f2df; }
+    .prompt { fill: #6ed29f; font-weight: 700; }
+    .number { fill: #fff3ae; font-weight: 700; }
+    .line { opacity: 0; animation: appear .18s ease-out forwards; }
+    .l2 { animation-delay: .20s; } .l3 { animation-delay: .40s; } .l4 { animation-delay: .60s; }
+    .l5 { animation-delay: .80s; } .l6 { animation-delay: 1s; } .l7 { animation-delay: 1.2s; }
+    @keyframes appear { to { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { .line { animation: none; opacity: 1; } }
+  </style>
+  <rect width="960" height="330" fill="#17272c"/>
+  <text x="28" y="42" class="command line"><tspan class="prompt">$</tspan> recipe-move-check demo --json</text>
+  <text x="28" y="82" class="line l2">source_system: mealie  →  destination_system: tandoor</text>
+  <text x="28" y="122" class="line l3">source_recipes: <tspan class="number">2</tspan>       destination_recipes: <tspan class="number">2</tspan></text>
+  <text x="28" y="162" class="line l4">possible_duplicates: <tspan class="number">1</tspan>  missing_images: <tspan class="number">1</tspan></text>
+  <text x="28" y="202" class="line l5">fields_to_review: <tspan class="number">3</tspan>      ownership_reviews: <tspan class="number">2</tspan></text>
+  <text x="28" y="252" class="line l6">report: move-check.md</text>
+  <text x="28" y="292" class="line l7">inventory: neutral-inventory.json</text>
+</svg>

@@ -2,7 +2,7 @@
 
 Check a recipe move before you import the family library.
 
-Recipe Library Move Check is a command-line preflight for households moving between Mealie and Tandoor. It inventories recipes, hashes available images within the selected export folders, finds likely duplicates, lists fields that will not map cleanly, and writes a review checklist.
+Recipe Library Move Check is a local CLI for households moving between Mealie and Tandoor. It inventories recipes and writes a review checklist. It flags possible duplicates, missing images, and fields to review.
 
 ## Try the sample
 
@@ -10,7 +10,9 @@ Recipe Library Move Check is a command-line preflight for households moving betw
 cargo run -- demo
 ```
 
-The command creates a temporary sandbox, runs the same checker used for real exports, and prints the report path. You can also view the site demo at `https://recipe-library-move-check.sociobot.in/demo`.
+The command copies the bundled sample into a temporary folder. It then runs the same checker used by the `check` command. It prints the checklist path and the folder you can delete afterward.
+
+Open the isolated browser sample at <https://recipe-library-move-check.sociobot.in/?demo=1>. Its banner includes **Reset demo** and **Start for real**.
 
 ## Check your exports
 
@@ -24,9 +26,11 @@ cargo run -- check \
   --inventory neutral-inventory.json
 ```
 
-The source is the library you plan to move. The destination is the existing library you want to protect. Folder paths may contain nested recipe JSON files and images. The checker reads the folders you select and writes only the report and inventory paths you name. It does not change either export.
+The source is the library you plan to move. The destination is the existing library you compare against. Recipe JSON files and images may be inside nested folders.
 
-For scripts, print the full result as JSON:
+The checker reads the two folders and writes only the two paths you name. It does not change either export.
+
+For scripts, print the complete result as JSON:
 
 ```sh
 cargo run -- check \
@@ -35,45 +39,47 @@ cargo run -- check \
   --json
 ```
 
-Exit code `0` means the check completed, even when review items exist. Invalid arguments or unreadable exports return a non-zero code. Run `recipe-move-check --help` for every option.
+Exit code `0` means the check completed, even when it found review items. Invalid arguments and unreadable folders return a non-zero code. Run `recipe-move-check --help` to see every option.
 
-## Supported export shapes
+## Supported export fields
 
-- Mealie: JSON files containing `name` or `recipe.name`, Schema.org ingredients, instruction text, tags, and local image paths.
-- Tandoor: JSON files containing `name`, structured steps and ingredients, keywords, servings, and local image paths.
+- Mealie: names, Schema.org ingredients, instruction text, tags, servings, and local image paths.
+- Tandoor: names, structured steps and ingredients, keywords, servings, and local image paths.
 
-Unknown JSON fields are preserved by name in the neutral inventory and listed for review. Image hashes identify equal files; they do not copy or grant rights to an image.
+The JSON inventory keeps unknown field names and lists them for review. Image hashes identify equal files inside the selected folders. They do not copy an image or grant rights to it.
 
 ## Install and package
-
-Rust 1.80 or newer is required.
 
 ```sh
 cargo install --path .
 cargo package
 ```
 
-The crate starts at version `0.1.0`. The factory owns publishing credentials; this repository does not publish itself.
+The crate starts at version `0.1.0`. The packaged CLI contains its source, license, README, changelog, and sample exports.
 
-## Develop and verify
+## Develop, test, and deploy
 
-Node 20 or newer is used only for the static documentation site and browser checks.
+Node is used only for the static documentation site and browser checks.
 
 ```sh
-npm install
+npm ci
 npm test
 npm run build
 ```
 
-`npm run build` compiles the release binary and writes the deployable site to `dist/site/`. `npm run build:site` builds only the site.
+`npm run build` compiles the release CLI and writes the deployable site to `dist/site/`. Build only the site with `npm run build:site`.
+
+The factory deploys `dist/site/` as a static site. No backend or account is required for the free CLI.
 
 ## Privacy and deletion
 
-The CLI reads selected export folders and writes only the report and inventory paths you request. Delete those files, or delete the temporary directory printed by `demo`, to remove its output. The optional paid planning pack verifies only its license token with Sociobot; see the site’s Privacy and Terms pages.
+The CLI reads selected folders and writes only your named checklist and inventory. Delete those files to remove its output. Delete the temporary folder printed by `demo` to remove the sample run.
+
+The optional planning pack sends only its license token to Sociobot. Read the site [Privacy](https://recipe-library-move-check.sociobot.in/privacy) and [Terms](https://recipe-library-move-check.sociobot.in/terms) pages.
 
 ## Limits
 
-This is a preflight, not an importer or server sync tool. Similarity scores are review hints, not proof. Export formats change, so inspect the checklist before moving the family library.
+This checker does not import recipes or sync servers. Similarity scores are review hints, not proof. Export formats change, so inspect the checklist before importing.
 
 ## License
 

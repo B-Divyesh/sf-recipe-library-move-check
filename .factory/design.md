@@ -12,7 +12,7 @@ Recipe moves are experiments with irreplaceable family material. The site looks 
 | ink-muted | `#4D5C5F` | secondary text; 6.1:1 on paper |
 | rule | `#87A8A4` | notebook lines and borders |
 | blue-pencil | `#155E75` | primary actions; white is 7.1:1 |
-| proof-red | `#9C2F2F` | collisions and correction marks |
+| proof-red | `#9C2F2F` | possible duplicates and correction marks |
 | mustard | `#B16B08` | warnings and tabs |
 | leaf | `#2E694B` | confirmed checks |
 | night-paper | `#17272C` | explicit dark treatment |
@@ -46,6 +46,7 @@ One signature motion is a 220 ms “proof mark” stroke when results appear. Sh
 ## Original assets and provenance
 
 - `site/public/notebook-migration.webp`: generated for this product with `/opt/fleet/lib/gen-image.sh` using the factory image deployment, 28 August 2026. Prompt: “Editorial overhead still life for a local recipe migration checker, handwritten scientific lab notebook on warm cream paper, two stacks of worn family recipe cards labelled only with abstract lines, a magnifying glass comparing duplicate cards, small red proofreader circles and blue pencil ticks, a USB export folder tab, restrained teal red mustard ink palette, tactile paper cutout and colored pencil texture, asymmetric composition with clear negative space, no readable text, no logos, no people, no gradient, no watermark.” The generated output is original project artwork; WebP derivative is stored in the repository.
+- `site/public/terminal-recording.svg`: hand-authored from the real `recipe-move-check demo --json` output on 29 August 2026. `examples/demo-recording.json` preserves the tested source values. The SVG uses only project palette tokens and no third-party assets.
 - Icons and check marks are hand-made CSS strokes or Unicode marks. No stock assets or third-party icon packs are used.
 - The Open Graph image is composed locally from the original artwork and product typography.
 

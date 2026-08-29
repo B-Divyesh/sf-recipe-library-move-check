@@ -8,7 +8,15 @@ license = "MIT"
 repository = "https://github.com/B-Divyesh/sf-recipe-library-move-check"
 keywords = ["recipes", "mealie", "tandoor", "migration", "cli"]
 categories = ["command-line-utilities"]
-exclude = ["site/", "tests/", ".factory/", "dist/", "node_modules/"]
+include = [
+  "/src/**",
+  "/examples/**",
+  "/Cargo.toml",
+  "/Cargo.lock",
+  "/README.md",
+  "/CHANGELOG.md",
+  "/LICENSE",
+]
 
 [[bin]]
 name = "recipe-move-check"
