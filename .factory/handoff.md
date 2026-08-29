@@ -1,8 +1,8 @@
-# Repair handoff — deployment pending
+# Repair handoff — PASS
 
 ## Outcome
 
-The release-blocking defects recorded in `.factory/verification-5.md` for candidate `89ad5b761c9969cf830b2e82176e752e501ac20c` are repaired locally. The static deployment follows this commit; its live URL and identity evidence will be added after upload.
+The release-blocking defects recorded in `.factory/verification-5.md` for candidate `89ad5b761c9969cf830b2e82176e752e501ac20c` are repaired and deployed. Repair commit: `7700995` (`fix: protect recipe exports and report partial reads`).
 
 ## Repairs
 
@@ -24,7 +24,9 @@ Before repair, the verifier's unsafe-output case replaced `source/lemon-pasta/re
 - `npm run build`: pass — release CLI plus `dist/site/`; initial JS 16.23 KB raw / 5.81 KB gzip and CSS 13.46 KB raw / 3.89 KB gzip.
 - `cargo package --allow-dirty --no-verify --list`: pass — 17 consumer files only. A fresh unpacked crate was installed into a temporary Cargo root; `recipe-move-check demo --json` returned the expected `2/2/1/1/3/2` summary.
 - Local browser verification against the production build: `/opt/fleet/lib/verify-url.sh http://127.0.0.1:4173 .factory/repair-verification` passed (559 ms load, no console/page errors, title/lang/one h1/main/alt/button checks). The Playwright suite separately exercised desktop and 320/390px mobile layouts, keyboard navigation, axe serious/critical checks, reduced motion, privacy/network isolation, offline reload, service-worker update, headers/config, and route metadata.
+- Static deployment: `/opt/fleet/lib/deploy-static.sh recipe-library-move-check dist/site` passed (Azure Static Web Apps deployment `6bdbfa72-cfed-4dad-90ca-b7fb4d087f1b`; HTTPS `200`). Local and live `index.html` SHA-256 are both `371a0e3228d1e3bc6e59565409e307e62e1d55ae6bc5dd80ce64cbc2a1d7ccb9`.
+- Live verification: `verify-url.sh` passed at `https://recipe-library-move-check.sociobot.in` (767 ms load, no console/page errors, correct title/lang/one h1/main/alt/button checks), and `PLAYWRIGHT_BASE_URL=https://recipe-library-move-check.sociobot.in npm run test:browser` passed 40/40. The live page sends HSTS, nosniff, strict referrer policy, permissions policy, and CSP with `frame-ancestors 'none'`. Checkout returned `303` to Dodo; an invalid-token verification returned `200`, `{"valid":false,"reason":"invalid"}`, and `Cache-Control: no-store`.
 
 ## Known gaps and next step
 
-No known product gap. Deploy `dist/site/` using the static work-order configuration, then confirm the live asset hash and run the live browser suite before release.
+No known product gaps or pending steps.
