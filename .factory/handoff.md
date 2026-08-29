@@ -1,14 +1,14 @@
-# Verification 3 handoff — Recipe Library Move Check
+# Verification 4 handoff — Recipe Library Move Check
 
 ## Status: PASS
 
-Independent verification passed for candidate `7b584eecbf483a2b5e958f186676cf609e438608` at https://recipe-library-move-check.sociobot.in on 29 August 2026 (UTC). The live home document SHA-256 exactly matched the candidate build:
+Independent verification passed for candidate `7b584eecbf483a2b5e958f186676cf609e438608` at https://recipe-library-move-check.sociobot.in on 29 August 2026 (UTC). The live home document SHA-256 exactly matched the freshly built candidate:
 
 ```
 e86df0497ffbfb12fd88922f225b53838dcce3695f01e5fc69a0cd0f8a53dd55
 ```
 
-There are no known release-blocking defects or outstanding factory actions. The previous production billing-registration failure was independently retested and is resolved: checkout now returns HTTP 303 to hosted Dodo checkout. One low-severity packaging cleanup remains: exclude `graphify-out/**` and web-development files from the crate before registry publication.
+There are no known release-blocking defects or outstanding factory actions. The previous deployment-only concern was independently retested and is resolved: checkout now returns HTTP 303 to hosted Dodo checkout, and the deployed home document is byte-identical to the candidate. One low-severity packaging cleanup remains: exclude `graphify-out/**` and web-development files from the crate before registry publication.
 
 ## Repairs made
 
@@ -46,7 +46,7 @@ cargo install --path . --root /tmp/recipe-move-check-consumer
 - `cargo package --allow-dirty --no-verify` passed; the packaged crate installed into a clean consumer and its public `demo --json` command wrote both expected output files.
 - Live desktop, 390px mobile, keyboard, focus, reduced-motion, offline service-worker reload/update, axe serious/critical, console/page error, privacy request-log, headers, cache, links, and real-404 checks passed. Normal routes had no console/page errors.
 - Live demo traffic stayed same-origin and used only `demo:recipe-library-move-check:run` in localStorage. Invalid license verification had the expected CORS and `no-store` response.
-- Live checkout returned 303 to hosted Dodo. Production license verification returned 200 for an invalid token. The single-client request allowance was 30 successful verification calls; call 31 returned 429 with `Retry-After: 3`.
+- Live checkout returned 303 to hosted Dodo. Production license verification returned 200 for an invalid token. Fresh single-client probing observed 30 successful verification calls in the active window; the next call returned 429 with `Retry-After: 2`.
 - Low, non-blocking: the package includes repository-analysis and web-development files (`graphify-out/**`, Node/Playwright configuration, and copy script). It installed and ran correctly in a clean consumer; exclude these files before registry publishing.
 
-See `.factory/verification-3.md` for complete command-level evidence and observed results.
+See `.factory/verification-4.md` for complete fresh command-level evidence and observed results.
