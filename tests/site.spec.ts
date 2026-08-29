@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { execFileSync, spawnSync } from "node:child_process";
 import {
   existsSync,
+  linkSync,
   mkdtempSync,
   mkdirSync,
   readFileSync,
@@ -40,6 +41,7 @@ type CliResult = {
     unmapped_fields: string[];
   }>;
   destination_recipes: CliResult["source_recipes"];
+  warnings: Array<{ file: string; message: string; affects_completeness: boolean }>;
   outputs: { report: string; inventory: string };
 };
 
@@ -244,6 +246,42 @@ test("@claim:cli-local-only leaves both exports byte-identical and changes only 
   rmSync(sandbox, { recursive: true, force: true });
 });
 
+test("@claim:safe-output-paths rejects export, input-alias, and overlapping output paths before any export changes", async () => {
+  const sandbox = mkdtempSync(join(tmpdir(), "recipe-move-check-safe-output-"));
+  const source = join(sandbox, "moving");
+  const destination = join(sandbox, "existing");
+  const output = join(sandbox, "review");
+  mkdirSync(source); mkdirSync(destination); mkdirSync(output);
+  const sourceRecipe = join(source, "recipe.json");
+  writeFileSync(sourceRecipe, '{"name":"Moving toast"}');
+  writeFileSync(join(destination, "recipe.json"), '{"name":"Existing toast"}');
+  const sourceBefore = treeDigest(source);
+  const destinationBefore = treeDigest(destination);
+  const run = (report: string, inventory: string) => spawnSync("cargo", [
+    "run", "--quiet", "--", "check", "--source", `mealie:${source}`, "--destination", `tandoor:${destination}`,
+    "--report", report, "--inventory", inventory,
+  ], { cwd: process.cwd(), encoding: "utf8" });
+
+  const insideExport = run(sourceRecipe, join(output, "inventory.json"));
+  expect(insideExport.status).toBe(2);
+  expect(insideExport.stderr).toContain("report path overlaps a selected export");
+  const inventoryInsideExport = run(join(output, "report.md"), join(destination, "inventory.json"));
+  expect(inventoryInsideExport.status).toBe(2);
+  expect(inventoryInsideExport.stderr).toContain("inventory path overlaps a selected export");
+  const hardLinkedInput = join(output, "input-alias.md");
+  linkSync(sourceRecipe, hardLinkedInput);
+  const inputAlias = run(hardLinkedInput, join(output, "inventory-2.json"));
+  expect(inputAlias.status).toBe(2);
+  expect(inputAlias.stderr).toContain("report path refers to an input file");
+  const shared = join(output, "shared.json");
+  const overlappingOutputs = run(shared, shared);
+  expect(overlappingOutputs.status).toBe(2);
+  expect(overlappingOutputs.stderr).toContain("report and inventory paths overlap");
+  expect(treeDigest(source)).toEqual(sourceBefore);
+  expect(treeDigest(destination)).toEqual(destinationBefore);
+  rmSync(sandbox, { recursive: true, force: true });
+});
+
 test("@claim:exit-codes reports success and input failures for scripts", async () => {
   const success = spawnSync("cargo", ["run", "--quiet", "--", "demo"], { cwd: process.cwd(), encoding: "utf8" });
   expect(success.status).toBe(0);
@@ -259,6 +297,55 @@ test("@claim:exit-codes reports success and input failures for scripts", async (
   ], { cwd: process.cwd(), encoding: "utf8" });
   expect(missing.status).toBe(2);
   expect(missing.stderr).toContain("export folder does not exist");
+});
+
+test("@claim:partial-read-warnings writes a marked partial checklist and returns exit code 1", async () => {
+  const sandbox = mkdtempSync(join(tmpdir(), "recipe-move-check-partial-"));
+  const source = join(sandbox, "moving");
+  const destination = join(sandbox, "existing");
+  const output = join(sandbox, "review");
+  mkdirSync(source); mkdirSync(destination); mkdirSync(output);
+  writeFileSync(join(source, "valid.json"), '{"name":"Moving toast","owner":"Ada"}');
+  writeFileSync(join(source, "broken.json"), "{not valid JSON");
+  writeFileSync(join(destination, "recipe.json"), '{"name":"Existing toast"}');
+  const report = join(output, "report.md");
+  const inventory = join(output, "inventory.json");
+  const result = spawnSync("cargo", [
+    "run", "--quiet", "--", "check", "--source", `mealie:${source}`, "--destination", `tandoor:${destination}`,
+    "--report", report, "--inventory", inventory,
+  ], { cwd: process.cwd(), encoding: "utf8" });
+  expect(result.status).toBe(1);
+  expect(result.stdout).toContain("Check completed with 1 input warning(s). The checklist and inventory are partial.");
+  expect(result.stdout).toContain("broken.json");
+  expect(result.stdout).toContain("Exit code: 1");
+  const checklist = readFileSync(report, "utf8");
+  expect(checklist).toContain("## Input warnings");
+  expect(checklist).toContain("This checklist is partial");
+  expect(checklist).toContain("broken.json");
+  expect(checklist).toContain("exit code 1");
+  expect(JSON.parse(readFileSync(inventory, "utf8")).warnings).toMatchObject([
+    { affects_completeness: true, message: expect.stringContaining("invalid JSON") },
+  ]);
+  rmSync(sandbox, { recursive: true, force: true });
+});
+
+test("@claim:family-review-empty-state explains when no owner or household review is needed", async () => {
+  const sandbox = mkdtempSync(join(tmpdir(), "recipe-move-check-family-empty-"));
+  const source = join(sandbox, "moving");
+  const destination = join(sandbox, "existing");
+  mkdirSync(source); mkdirSync(destination);
+  writeFileSync(join(source, "recipe.json"), '{"name":"Moving toast","owner":"Ada"}');
+  writeFileSync(join(destination, "recipe.json"), '{"name":"Existing toast"}');
+  const report = join(sandbox, "report.md");
+  const inventory = join(sandbox, "inventory.json");
+  const result = spawnSync("cargo", [
+    "run", "--quiet", "--", "check", "--source", `tandoor:${source}`, "--destination", `mealie:${destination}`,
+    "--report", report, "--inventory", inventory,
+  ], { cwd: process.cwd(), encoding: "utf8" });
+  expect(result.status).toBe(0);
+  const checklist = readFileSync(report, "utf8");
+  expect(checklist).toMatch(/## Family review\n\nNo owner or household access checks were found\.\n\n## Before importing/);
+  rmSync(sandbox, { recursive: true, force: true });
 });
 
 test("@claim:supported-fields maps the documented Mealie and Tandoor fields", async () => {
@@ -329,6 +416,22 @@ test("@claim:license-privacy sends only the token to the Sociobot verification r
     "sb_license:recipe-library-move-check",
     "sb_license:recipe-library-move-check:verdict",
   ]);
+});
+
+test("@claim:cached-license-notice keeps the inactive-license recovery message during its cached day", async ({ page }) => {
+  let requests = 0;
+  await page.route("https://api.sociobot.in/**", route => {
+    requests += 1;
+    return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ valid: false, reason: "invalid" }) });
+  });
+  await page.goto("/?license=inactive-license");
+  await expect(page.getByText("This license is no longer active.")).toBeVisible();
+  await expect(page.locator("#license-status").getByRole("link", { name: "Buy the planning pack" })).toBeVisible();
+  expect(requests).toBe(1);
+  await page.reload();
+  await expect(page.getByText("This license is no longer active.")).toBeVisible();
+  await expect(page.locator("#license-status").getByRole("link", { name: "Buy the planning pack" })).toBeVisible();
+  expect(requests).toBe(1);
 });
 
 test("@claim:offline-demo reloads the isolated sample after the first visit", async ({ page, context }) => {
@@ -454,6 +557,25 @@ test("keyboard navigation, route focus, and browser Back restore the page", asyn
   await page.goBack();
   await expect(page).toHaveURL(`${EXPECTED_ORIGIN}/`);
   await expect(page.locator("h1")).toBeFocused();
+});
+
+test("@claim:button-focus-contrast gives every visible button a 3px high-contrast focus outline", async ({ page }) => {
+  await page.goto("/");
+  const controls = page.locator(".button:visible");
+  const count = await controls.count();
+  expect(count).toBeGreaterThan(0);
+  for (let index = 0; index < count; index += 1) {
+    const focus = await controls.nth(index).evaluate(element => {
+      (element as HTMLElement).focus();
+      const style = getComputedStyle(element);
+      const paper = getComputedStyle(document.documentElement).getPropertyValue("--paper").trim();
+      return { outlineColor: style.outlineColor, outlineWidth: style.outlineWidth, outlineOffset: style.outlineOffset, paper };
+    });
+    expect(focus.outlineColor).toBe("rgb(23, 44, 53)");
+    expect(Number.parseFloat(focus.outlineWidth)).toBeGreaterThanOrEqual(3);
+    expect(Number.parseFloat(focus.outlineOffset)).toBeGreaterThanOrEqual(3);
+    expect(focus.paper).toBe("#f4eeda");
+  }
 });
 
 test("the complete first-screen message fits a 390px phone viewport", async ({ page }) => {

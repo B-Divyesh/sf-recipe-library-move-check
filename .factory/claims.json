@@ -49,11 +49,32 @@
     "sandbox": "hash every source and destination file plus the parent sandbox before and after; assert only two named outputs change"
   },
   {
+    "id": "safe-output-paths",
+    "claim": "The checker rejects report or inventory paths that overlap an export, an input file alias, or each other before changing either export.",
+    "where": "README and CLI errors",
+    "test": "npm test -- --grep @claim:safe-output-paths",
+    "sandbox": "fresh temporary exports; attempt each unsafe output path and hash both exports before and after"
+  },
+  {
     "id": "exit-codes",
     "claim": "Completed checks return exit code 0; invalid arguments and unreadable folders return a non-zero code.",
     "where": "README",
     "test": "npm test -- --grep @claim:exit-codes",
     "sandbox": "run the binary with sample findings, an invalid system, and a missing export folder"
+  },
+  {
+    "id": "partial-read-warnings",
+    "claim": "If a recipe JSON file cannot be read, the checker marks the checklist and inventory as partial, names the file in human output, and returns exit code 1.",
+    "where": "README and generated checklist",
+    "test": "npm test -- --grep @claim:partial-read-warnings",
+    "sandbox": "one valid recipe plus malformed JSON; inspect stdout, Markdown, JSON inventory, and exit status"
+  },
+  {
+    "id": "family-review-empty-state",
+    "claim": "A checklist says when no owner or household access review is needed.",
+    "where": "generated checklist",
+    "test": "npm test -- --grep @claim:family-review-empty-state",
+    "sandbox": "valid source recipes with owners and no household field; inspect the Family review section"
   },
   {
     "id": "supported-fields",
@@ -75,6 +96,20 @@
     "where": "privacy page and README",
     "test": "npm test -- --grep @claim:license-privacy",
     "sandbox": "fresh browser with a recorded verification response; inspect exact URL, query keys, method, body, referrer, and storage"
+  },
+  {
+    "id": "cached-license-notice",
+    "claim": "An inactive planning-pack license keeps its recovery notice during the cached verification period.",
+    "where": "planning-pack status message",
+    "test": "npm test -- --grep @claim:cached-license-notice",
+    "sandbox": "recorded invalid verification response, then reload before the one-day cache expires"
+  },
+  {
+    "id": "button-focus-contrast",
+    "claim": "Visible button controls show a high-contrast focus outline for keyboard use.",
+    "where": "site controls and design notes",
+    "test": "npm test -- --grep @claim:button-focus-contrast",
+    "sandbox": "keyboard-focus every visible button-styled control on the landing page and inspect its outline"
   },
   {
     "id": "offline-demo",

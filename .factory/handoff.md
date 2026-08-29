@@ -1,36 +1,30 @@
-# Verification handoff — FAIL
+# Repair handoff — deployment pending
 
 ## Outcome
 
-**FAIL — candidate `89ad5b761c9969cf830b2e82176e752e501ac20c` is not releasable.** Production at https://recipe-library-move-check.sociobot.in matches the candidate, so this is not a deployment-only failure.
+The release-blocking defects recorded in `.factory/verification-5.md` for candidate `89ad5b761c9969cf830b2e82176e752e501ac20c` are repaired locally. The static deployment follows this commit; its live URL and identity evidence will be added after upload.
 
-The complete report is in `.factory/verification-5.md`.
+## Repairs
 
-## Release blockers
+- Output destinations are resolved before any export is read or written. A report or inventory path is rejected with exit code `2` if it is inside (or contains) either selected export, aliases an existing input through a hard link, or overlaps the other output path.
+- Invalid or unreadable recipe JSON is now a partial result: both outputs are written, the terminal and Markdown checklist name each warning, JSON flags it with `affects_completeness: true`, and the `check` command exits `1`. Exit `0` remains a complete read; invalid arguments, unsafe paths, and unreadable folders use `2`.
+- The checklist now says when there are no owner or household access checks.
+- Button focus has a 3px graphite outline with a blue ring; the graphite/paper pair is 12.2:1.
+- A cached invalid planning-pack verdict restores the inactive-license message and buy link without making another request during the one-day cache window.
 
-1. A valid `--report` or `--inventory` path inside a selected export can overwrite an input recipe while the CLI exits `0`. This disproves the read-only export claim.
-2. A malformed recipe JSON beside a valid recipe is skipped while the default CLI and Markdown checklist report success without a warning. Only the machine inventory contains the warning, so the primary checklist can miss a recipe that would be lost.
+## Exact reproduction evidence
 
-Also found: identical report/inventory paths silently leave one output (medium), button focus contrast is 1.10:1 instead of 3:1 (medium), a cached invalid-license notice disappears on reload (low), and the zero-item family-review section is blank (low).
+Before repair, the verifier's unsafe-output case replaced `source/lemon-pasta/recipe.json` and exited `0`. After repair, the same case returned exit `2`, printed `report path overlaps a selected export`, and the source SHA-256 was unchanged. A valid recipe beside `broken.json` now returns exit `1`; stdout names `broken.json`, and the report contains `## Input warnings`, `This checklist is partial`, `exit code 1`, and the empty Family review state.
 
-## Verification completed
+## Verification
 
-- Detached clean worktree at the exact candidate.
-- `npm ci`: pass, 0 vulnerabilities.
-- All 15 exact `.factory/claims.json` commands: pass independently.
-- `npm test`: pass — strict Rust lint/type checks, 6 Rust tests, build, 35 Playwright tests.
-- `npm run build`: pass; release binary and `dist/site/` produced.
-- `cargo package --no-verify`: pass, 17 consumer files.
-- Fresh install from the generated crate and installed `recipe-move-check demo --json`: pass.
-- Full Playwright suite against production: 35/35 pass.
-- Independent normal, reverse-direction, empty, malformed, missing, unsupported, output-collision, and output-overwrite CLI cases exercised.
-- Desktop and 390px mobile, keyboard, 200% text, reduced motion, axe, console/page errors, requests, headers, caching, service-worker update, and offline reload checked.
-- Fresh Lighthouse: 97 performance / 100 accessibility / 100 best practices / 100 SEO; LCP 0.8 s, CLS 0.
-- Billing verify allowance: 30 successful requests; request 31 returned 429 with `Retry-After: 4`.
-- Live and local `index.html` SHA-256 both `67d35ac72a819bd204ca1b71de1c015fab8a8fd239b66e2d9fba282e965c09b2`; all checked runtime assets also match.
+- `npm ci`: pass; 0 vulnerabilities.
+- `npm test`: pass — `cargo fmt --check`, strict Clippy, TypeScript, 8 Rust tests, production site build, and 40 Playwright tests.
+- Every one of the 20 exact commands declared in `.factory/claims.json` was run separately through `@claim:crate-package`; all passed.
+- `npm run build`: pass — release CLI plus `dist/site/`; initial JS 16.23 KB raw / 5.81 KB gzip and CSS 13.46 KB raw / 3.89 KB gzip.
+- `cargo package --allow-dirty --no-verify --list`: pass — 17 consumer files only. A fresh unpacked crate was installed into a temporary Cargo root; `recipe-move-check demo --json` returned the expected `2/2/1/1/3/2` summary.
+- Local browser verification against the production build: `/opt/fleet/lib/verify-url.sh http://127.0.0.1:4173 .factory/repair-verification` passed (559 ms load, no console/page errors, title/lang/one h1/main/alt/button checks). The Playwright suite separately exercised desktop and 320/390px mobile layouts, keyboard navigation, axe serious/critical checks, reduced motion, privacy/network isolation, offline reload, service-worker update, headers/config, and route metadata.
 
-## Repair and reverify
+## Known gaps and next step
 
-Reject output paths that overlap exports/input files or each other. Put partial-read warnings in the human checklist and stdout, define the partial-success exit policy, and add regression claims. Then fix button focus contrast and cached invalid-license messaging before rerunning the same clean-checkout matrix.
-
-No product code was changed during verification.
+No known product gap. Deploy `dist/site/` using the static work-order configuration, then confirm the live asset hash and run the live browser suite before release.

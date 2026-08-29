@@ -37,7 +37,7 @@ The palette comes from field notebooks, fountain ink, correction pencil, and old
 
 The landing page is an open workbench, not a centered hero. Copy occupies the left notebook page. The original illustration and terminal transcript overlap on the right like evidence clipped to the sheet. Long red proof lines connect a reported issue to the relevant checklist item. The live preview uses a two-column specimen ledger on wide screens and one continuous page at 390 pixels.
 
-Every action gives a short written status in a live region. Links stay underlined. Focus uses a double blue-pencil outline. The phone layout drops decorative tape and keeps the evidence, actions, and result counts.
+Every action gives a short written status in a live region. Links stay underlined. Button focus uses a 3-pixel graphite outline, offset from the control, plus a blue-pencil ring; the graphite outline is 12.2:1 against the paper. The phone layout drops decorative tape and keeps the evidence, actions, and result counts.
 
 ## Motion
 

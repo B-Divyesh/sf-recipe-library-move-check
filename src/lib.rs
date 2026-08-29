@@ -104,6 +104,9 @@ pub struct Collision {
 pub struct Warning {
     pub file: String,
     pub message: String,
+    /// True when a recipe JSON file could not be read. The generated outputs
+    /// are useful, but do not describe every file in the selected exports.
+    pub affects_completeness: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -137,8 +140,9 @@ pub struct CheckResult {
 }
 
 pub fn run_check(options: CheckOptions) -> Result<CheckResult, String> {
-    validate_export(&options.source)?;
-    validate_export(&options.destination)?;
+    let source_root = validate_export(&options.source)?;
+    let destination_root = validate_export(&options.destination)?;
+    validate_output_paths(&options, &[source_root, destination_root])?;
     let (source_recipes, mut warnings) = read_export(&options.source)?;
     let (destination_recipes, destination_warnings) = read_export(&options.destination)?;
     warnings.extend(destination_warnings);
@@ -152,6 +156,7 @@ pub fn run_check(options: CheckOptions) -> Result<CheckResult, String> {
         warnings.push(Warning {
             file: options.destination.folder.display().to_string(),
             message: "the destination has no recipes; possible duplicate results are empty".into(),
+            affects_completeness: false,
         });
     }
     let collisions = find_collisions(&source_recipes, &destination_recipes);
@@ -207,7 +212,7 @@ pub fn run_check(options: CheckOptions) -> Result<CheckResult, String> {
     Ok(result)
 }
 
-fn validate_export(spec: &ExportSpec) -> Result<(), String> {
+fn validate_export(spec: &ExportSpec) -> Result<PathBuf, String> {
     if !spec.folder.exists() {
         return Err(format!(
             "{} export folder does not exist: {}",
@@ -222,7 +227,140 @@ fn validate_export(spec: &ExportSpec) -> Result<(), String> {
             spec.folder.display()
         ));
     }
+    fs::canonicalize(&spec.folder).map_err(|e| {
+        format!(
+            "could not resolve {} export folder {}: {e}",
+            spec.system,
+            spec.folder.display()
+        )
+    })
+}
+
+/// Resolve a path for safety comparisons without creating its parent. Existing
+/// ancestors are canonicalized so a symlink cannot make an output appear to be
+/// outside an export when it is not.
+fn path_for_comparison(path: &Path) -> Result<PathBuf, String> {
+    let absolute = if path.is_absolute() {
+        path.to_path_buf()
+    } else {
+        std::env::current_dir()
+            .map_err(|e| format!("could not resolve the current folder: {e}"))?
+            .join(path)
+    };
+    let normalized = normalize_path(&absolute);
+    if normalized.exists() {
+        return fs::canonicalize(&normalized)
+            .map_err(|e| format!("could not resolve {}: {e}", normalized.display()));
+    }
+
+    let mut existing = normalized.as_path();
+    let mut tail = Vec::new();
+    while !existing.exists() {
+        let Some(name) = existing.file_name() else {
+            return Err(format!("could not resolve {}", normalized.display()));
+        };
+        tail.push(name.to_os_string());
+        let Some(parent) = existing.parent() else {
+            return Err(format!("could not resolve {}", normalized.display()));
+        };
+        existing = parent;
+    }
+    let mut resolved = fs::canonicalize(existing)
+        .map_err(|e| format!("could not resolve {}: {e}", existing.display()))?;
+    for component in tail.iter().rev() {
+        resolved.push(component);
+    }
+    Ok(resolved)
+}
+
+fn normalize_path(path: &Path) -> PathBuf {
+    use std::path::Component;
+
+    let mut normalized = PathBuf::new();
+    for component in path.components() {
+        match component {
+            Component::CurDir => {}
+            Component::ParentDir => {
+                normalized.pop();
+            }
+            other => normalized.push(other.as_os_str()),
+        }
+    }
+    normalized
+}
+
+fn paths_overlap(left: &Path, right: &Path) -> bool {
+    left.starts_with(right) || right.starts_with(left)
+}
+
+fn validate_output_paths(options: &CheckOptions, export_roots: &[PathBuf]) -> Result<(), String> {
+    let report = path_for_comparison(&options.report)?;
+    let inventory = path_for_comparison(&options.inventory)?;
+    for (label, output) in [("report", &report), ("inventory", &inventory)] {
+        for root in export_roots {
+            if paths_overlap(output, root) {
+                return Err(format!(
+                    "{label} path overlaps a selected export: {}. Choose an output folder outside both exports",
+                    output.display()
+                ));
+            }
+        }
+    }
+    if paths_overlap(&report, &inventory) {
+        return Err(format!(
+            "report and inventory paths overlap: {} and {}. Choose two different output files",
+            report.display(),
+            inventory.display()
+        ));
+    }
+    for (label, output) in [("report", &report), ("inventory", &inventory)] {
+        if output.exists() && output.is_file() {
+            for root in export_roots {
+                let mut inputs = Vec::new();
+                collect_files(root, &mut inputs)
+                    .map_err(|e| format!("could not inspect {}: {e}", root.display()))?;
+                if inputs.iter().any(|input| same_file(output, input)) {
+                    return Err(format!(
+                        "{label} path refers to an input file: {}. Choose an output file outside both exports",
+                        output.display()
+                    ));
+                }
+            }
+        }
+    }
     Ok(())
+}
+
+fn collect_files(folder: &Path, output: &mut Vec<PathBuf>) -> std::io::Result<()> {
+    for entry in fs::read_dir(folder)? {
+        let entry = entry?;
+        let path = entry.path();
+        let kind = entry.file_type()?;
+        if kind.is_dir() {
+            collect_files(&path, output)?;
+        } else if kind.is_file() {
+            output.push(path);
+        }
+    }
+    Ok(())
+}
+
+#[cfg(unix)]
+fn same_file(left: &Path, right: &Path) -> bool {
+    use std::os::unix::fs::MetadataExt;
+
+    match (fs::metadata(left), fs::metadata(right)) {
+        (Ok(left), Ok(right)) => left.dev() == right.dev() && left.ino() == right.ino(),
+        _ => false,
+    }
+}
+
+#[cfg(not(unix))]
+fn same_file(left: &Path, right: &Path) -> bool {
+    match (fs::canonicalize(left), fs::canonicalize(right)) {
+        (Ok(left), Ok(right)) => left == right,
+        _ => false,
+    }
 }
 
 fn write_parent(path: &Path) -> Result<(), String> {
@@ -247,6 +385,7 @@ fn read_export(spec: &ExportSpec) -> Result<(Vec<Recipe>, Vec<Warning>), String>
                 warnings.push(Warning {
                     file: path.display().to_string(),
                     message: format!("could not read JSON: {error}"),
+                    affects_completeness: true,
                 });
                 continue;
             }
@@ -257,6 +396,7 @@ fn read_export(spec: &ExportSpec) -> Result<(Vec<Recipe>, Vec<Warning>), String>
                 warnings.push(Warning {
                     file: path.display().to_string(),
                     message: format!("invalid JSON: {error}"),
+                    affects_completeness: true,
                 });
                 continue;
             }
@@ -740,21 +880,50 @@ fn render_report(result: &CheckResult) -> String {
         }
         text.push('\n');
     }
+    text.push_str("## Input warnings\n\n");
+    if result.warnings.is_empty() {
+        text.push_str("Every JSON file was read.\n\n");
+    } else {
+        let partial = result
+            .warnings
+            .iter()
+            .filter(|warning| warning.affects_completeness)
+            .count();
+        if partial > 0 {
+            text.push_str(&format!(
+                "**This checklist is partial.** {partial} JSON file(s) could not be read. The CLI returns exit code 1 so scripts can stop before importing. Fix the files below and run the check again.\n\n"
+            ));
+        }
+        for warning in &result.warnings {
+            text.push_str(&format!(
+                "- [ ] `{}` — {}\n",
+                escape_md(&warning.file),
+                escape_md(&warning.message)
+            ));
+        }
+        text.push('\n');
+    }
     text.push_str("## Family review\n\n");
+    let mut family_review_count = 0;
     for recipe in &result.source_recipes {
         if recipe.owner.is_none() {
+            family_review_count += 1;
             text.push_str(&format!(
                 "- [ ] Choose an owner for **{}**.\n",
                 escape_md(&recipe.name)
             ));
         }
         if let Some(household) = &recipe.household {
+            family_review_count += 1;
             text.push_str(&format!(
                 "- [ ] Recreate household access for **{}** (was `{}`).\n",
                 escape_md(&recipe.name),
                 escape_md(household)
             ));
         }
+    }
+    if family_review_count == 0 {
+        text.push_str("No owner or household access checks were found.\n");
     }
     text.push_str("\n## Before importing\n\n- [ ] Back up both original export folders.\n- [ ] Resolve every possible duplicate above.\n- [ ] Locate missing images or accept that they will be absent.\n- [ ] Assign owners and household access.\n- [ ] Import a small test batch first.\n- [ ] Keep this report beside the untouched exports.\n\nThis checker reads exports only. Similarity is a review hint, not proof of a duplicate. Image hashes do not grant permission to copy content.\n");
     text
@@ -954,5 +1123,96 @@ mod tests {
             .source_recipes
             .iter()
             .all(|recipe| recipe.image.sha256.is_none()));
+    }
+
+    #[test]
+    fn output_paths_cannot_overlap_exports_or_each_other() {
+        let temp = tempdir().unwrap();
+        let source = temp.path().join("source");
+        let destination = temp.path().join("destination");
+        fs::create_dir(&source).unwrap();
+        fs::create_dir(&destination).unwrap();
+        let input = source.join("recipe.json");
+        fs::write(&input, r#"{"name":"Moving toast"}"#).unwrap();
+        fs::write(
+            destination.join("recipe.json"),
+            r#"{"name":"Existing toast"}"#,
+        )
+        .unwrap();
+        let before = fs::read(&input).unwrap();
+
+        let inside_export = run_check(CheckOptions {
+            source: ExportSpec {
+                system: RecipeSystem::Mealie,
+                folder: source.clone(),
+            },
+            destination: ExportSpec {
+                system: RecipeSystem::Tandoor,
+                folder: destination.clone(),
+            },
+            report: input.clone(),
+            inventory: temp.path().join("inventory.json"),
+        })
+        .unwrap_err();
+        assert!(inside_export.contains("report path overlaps a selected export"));
+        assert_eq!(fs::read(&input).unwrap(), before);
+
+        let shared = temp.path().join("shared-output.json");
+        let aliased_outputs = run_check(CheckOptions {
+            source: ExportSpec {
+                system: RecipeSystem::Mealie,
+                folder: source,
+            },
+            destination: ExportSpec {
+                system: RecipeSystem::Tandoor,
+                folder: destination,
+            },
+            report: shared.clone(),
+            inventory: shared,
+        })
+        .unwrap_err();
+        assert!(aliased_outputs.contains("report and inventory paths overlap"));
+    }
+
+    #[test]
+    fn malformed_recipe_is_prominent_in_partial_report_and_empty_family_review_explains_itself() {
+        let temp = tempdir().unwrap();
+        let source = temp.path().join("source");
+        let destination = temp.path().join("destination");
+        fs::create_dir(&source).unwrap();
+        fs::create_dir(&destination).unwrap();
+        fs::write(
+            source.join("valid.json"),
+            r#"{"name":"Moving toast","owner":"Ada"}"#,
+        )
+        .unwrap();
+        fs::write(source.join("broken.json"), "{bad json").unwrap();
+        fs::write(
+            destination.join("recipe.json"),
+            r#"{"name":"Existing toast"}"#,
+        )
+        .unwrap();
+        let report = temp.path().join("report.md");
+        let result = run_check(CheckOptions {
+            source: ExportSpec {
+                system: RecipeSystem::Mealie,
+                folder: source,
+            },
+            destination: ExportSpec {
+                system: RecipeSystem::Tandoor,
+                folder: destination,
+            },
+            report: report.clone(),
+            inventory: temp.path().join("inventory.json"),
+        })
+        .unwrap();
+        assert_eq!(result.warnings.len(), 1);
+        assert!(result.warnings[0].affects_completeness);
+        let checklist = fs::read_to_string(report).unwrap();
+        assert!(checklist.contains("## Input warnings"));
+        assert!(checklist.contains("broken.json"));
+        assert!(checklist.contains("This checklist is partial"));
+        assert!(checklist.contains("exit code 1"));
+        assert!(checklist.contains("No owner or household access checks were found."));
     }
 }

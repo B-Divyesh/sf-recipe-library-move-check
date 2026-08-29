@@ -28,6 +28,7 @@ h3 { font-size:1.35rem; }
 .button { min-height:48px; padding:12px 20px; display:inline-flex; justify-content:center; align-items:center; border:2px solid var(--ink); background:var(--blue); color:white; box-shadow:4px 4px 0 var(--ink); text-decoration:none; font-weight:800; cursor:pointer; border-radius:2px 5px 3px 6px; transition:transform 160ms ease,box-shadow 160ms ease; }
 .button:hover { transform:translate(-2px,-2px); box-shadow:6px 6px 0 var(--ink); }
 .button:active,.button.was-pressed { transform:translate(3px,3px); box-shadow:1px 1px 0 var(--ink); }
+.button:focus,.button:focus-visible { outline:3px solid var(--ink); outline-offset:3px; box-shadow:0 0 0 6px var(--blue),4px 4px 0 var(--ink); }
 .button-dark { background:var(--night); }
 .button-paper { background:var(--sheet); color:var(--ink); }
 .button-small { min-height:44px; padding:8px 14px; }

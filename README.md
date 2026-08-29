@@ -28,7 +28,7 @@ cargo run -- check \
 
 The source is the library you plan to move. The destination is the existing library you compare against. Recipe JSON files and images may be inside nested folders.
 
-The checker reads the two folders and writes only the two paths you name. It does not change either export.
+The checker reads the two folders and writes only the two paths you name. It does not change either export. It rejects report or inventory paths inside either export, paths that alias an input file, and report/inventory paths that overlap each other.
 
 The JSON inventory is a JSON file for scripts or another recipe tool. Print the complete result as JSON:
 
@@ -39,7 +39,7 @@ cargo run -- check \
   --json
 ```
 
-Exit code `0` means the check completed, even when it found review items. Invalid arguments and unreadable folders return a non-zero code. Run `recipe-move-check --help` to see every option.
+Exit code `0` means the check read every recipe JSON file, even when it found review items. Exit code `1` means it wrote a marked **partial** checklist and inventory because one or more JSON files could not be read; fix the named files and run it again before importing. Invalid arguments, unsafe output paths, and unreadable folders return exit code `2`. Run `recipe-move-check --help` to see every option.
 
 ## Supported export fields
 

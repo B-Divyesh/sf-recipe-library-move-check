@@ -18,6 +18,7 @@
 - It prints the exact sandbox path. Delete that directory to reset or remove the demo.
 - The sample source includes Lemon Pasta and Red Lentil Soup. The destination includes Lemon Pasta and Sunday Granola.
 - The result contains one possible duplicate, one missing image, three field review items, and two ownership reviews.
+- A normal completed check exits `0`. If a recipe JSON file cannot be read, the CLI still writes a clearly marked partial checklist and inventory, then exits `1` so scripts can stop before import. Invalid inputs and unsafe output paths exit `2` and write nothing.
 - `site/public/terminal-recording.svg` is the self-hosted recording. Its source data is `examples/demo-recording.json`.
 - The `demo-is-real-cli` claim test compares this data with both CLI entry points on every test run.
 

@@ -43,16 +43,32 @@ fn parse_export(value: &str) -> Result<ExportSpec, String> {
 
 fn main() {
     let cli = Cli::parse();
-    let result = match cli.command {
+    let exit_code = match cli.command {
         Command::Check { source, destination, report, inventory, json } => {
             run_check(CheckOptions { source, destination, report, inventory }).map(|result| {
+                let partial_warnings: Vec<_> = result
+                    .warnings
+                    .iter()
+                    .filter(|warning| warning.affects_completeness)
+                    .collect();
                 if json {
                     println!("{}", serde_json::to_string_pretty(&result).expect("result serializes"));
                 } else {
-                    println!("Check complete: {} possible duplicate(s), {} missing image(s), {} field review item(s).", result.summary.collisions, result.summary.missing_images, result.summary.unmapped_fields);
+                    if partial_warnings.is_empty() {
+                        println!("Check complete: {} possible duplicate(s), {} missing image(s), {} field review item(s).", result.summary.collisions, result.summary.missing_images, result.summary.unmapped_fields);
+                    } else {
+                        println!("Check completed with {} input warning(s). The checklist and inventory are partial.", partial_warnings.len());
+                    }
+                    for warning in &result.warnings {
+                        println!("Warning: {} — {}", warning.file, warning.message);
+                    }
                     println!("Report: {}", result.outputs.report.display());
                     println!("Inventory: {}", result.outputs.inventory.display());
+                    if !partial_warnings.is_empty() {
+                        println!("Exit code: 1. Fix the input warnings and run the check again before importing.");
+                    }
                 }
+                if partial_warnings.is_empty() { 0 } else { 1 }
             })
         }
         Command::Demo { json } => run_demo().map(|(result, root)| {
@@ -64,11 +80,16 @@ fn main() {
                 println!("Review the demo report: {}", result.outputs.report.display());
                 println!("Delete this sandbox when finished: {}", root.display());
             }
+            0
         }),
     };
 
-    if let Err(error) = result {
-        eprintln!("Could not complete the check: {error}");
-        std::process::exit(2);
+    match exit_code {
+        Ok(0) => {}
+        Ok(code) => std::process::exit(code),
+        Err(error) => {
+            eprintln!("Could not complete the check: {error}");
+            std::process::exit(2);
+        }
     }
 }

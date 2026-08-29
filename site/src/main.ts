@@ -188,6 +188,7 @@ function bindLicense(): void {
   if (token) {
     const cached = parseVerdict();
     if (cached?.valid) showUnlocked();
+    else if (cached) showInactiveLicense();
     if (!cached || Date.now() - cached.checked > 86_400_000) verifyLicense(token, false);
   }
 }
@@ -204,7 +205,7 @@ async function verifyLicense(token: string, announce: boolean): Promise<void> {
     const verdict = await response.json() as { valid: boolean };
     localStorage.setItem(VERDICT_KEY, JSON.stringify({ valid: verdict.valid, checked: Date.now() }));
     if (verdict.valid) showUnlocked();
-    else if (label) label.innerHTML = `This license is no longer active. <a href="${API}/products/${SLUG}/checkout">Buy the planning pack</a>.`;
+    else showInactiveLicense();
   } catch {
     if (label) label.textContent = "The license check could not connect. The free checker still works.";
   }
@@ -215,6 +216,11 @@ function showUnlocked(): void {
   const download = document.querySelector<HTMLButtonElement>("#download-pack");
   if (label) label.textContent = "Planning pack ready on this device.";
   if (download) download.hidden = false;
+}
+
+function showInactiveLicense(): void {
+  const label = document.querySelector<HTMLElement>("#license-status");
+  if (label) label.innerHTML = `This license is no longer active. <a href="${API}/products/${SLUG}/checkout">Buy the planning pack</a>.`;
 }
 
 function downloadPack(): void {
