@@ -277,6 +277,8 @@ test("@claim:supported-fields maps the documented Mealie and Tandoor fields", as
   const tandoor = result.destination_recipes.find(recipe => recipe.name === "Lemon Pasta")!;
   expect(tandoor.ingredients).toEqual(["250 g spaghetti", "1 lemon", "2 tbsp olive oil"]);
   expect(tandoor.instructions).toEqual(["Boil pasta, then toss with lemon and oil."]);
+  expect(tandoor.tags).toEqual(["weeknight", "family"]);
+  expect(tandoor.servings).toBe("4");
   expect(tandoor.image.status).toBe("present");
   rmSync(result.outputs.report, { force: true });
   rmSync(result.outputs.inventory, { force: true });

@@ -6,6 +6,8 @@
     {"amount": 2, "unit": {"name": "tbsp"}, "food": {"name": "olive oil"}}
   ],
   "steps": [{"instruction": "Boil pasta, then toss with lemon and oil."}],
+  "keywords": "weeknight, family",
+  "servings": 4,
   "image": "lemon.jpg",
   "owner": {"name": "Sam"}
 }
