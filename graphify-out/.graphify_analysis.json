@@ -234,23 +234,13 @@
       "degree": 12
     },
     {
-      "id": "src_lib_recipesystem",
-      "label": "RecipeSystem",
-      "degree": 11
-    },
-    {
-      "id": "src_lib_exportspec",
-      "label": "ExportSpec",
-      "degree": 11
-    },
-    {
       "id": "src_lib_checkresult",
       "label": "CheckResult",
       "degree": 11
     },
     {
-      "id": "src_lib_validate_output_paths",
-      "label": "validate_output_paths()",
+      "id": "src_lib_collect_input_file",
+      "label": "collect_input_file()",
       "degree": 11
     },
     {
@@ -264,8 +254,18 @@
       "degree": 11
     },
     {
-      "id": "src_lib_collect_input_file",
-      "label": "collect_input_file()",
+      "id": "src_lib_validate_output_paths",
+      "label": "validate_output_paths()",
+      "degree": 11
+    },
+    {
+      "id": "src_lib_exportspec",
+      "label": "ExportSpec",
+      "degree": 11
+    },
+    {
+      "id": "src_lib_recipesystem",
+      "label": "RecipeSystem",
       "degree": 11
     }
   ],
