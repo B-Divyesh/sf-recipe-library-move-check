@@ -1,0 +1,8 @@
+{
+  "captured_at": "2026-08-29T07:18:22Z",
+  "checkout_endpoint": "https://api.sociobot.in/api/v1/products/recipe-library-move-check/checkout",
+  "redirect_origin": "https://checkout.dodopayments.com",
+  "checkout_title": "Sociobot | Checkout",
+  "checkout_footer": "This order process is conducted by our online reseller & Merchant of Record, dodopayments.com, who also handles order-related inquiries and returns.",
+  "product_disclosure": "Dodo Payments is the online reseller and merchant of record. Use the support link in your Dodo receipt for order questions and returns."
+}

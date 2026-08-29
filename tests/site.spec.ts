@@ -97,7 +97,7 @@ test("@claim:demo-privacy isolates, resets, and discards the browser sample", as
   expect(outgoing).toEqual([]);
 });
 
-test("@claim:cli-capabilities inventories, hashes, compares, and reports the sample", async () => {
+test("@claim:cli-capabilities inventories, hashes, compares, and reports the sample", async ({ page }) => {
   const result = JSON.parse(runCargo(["demo", "--json"])) as CliResult;
   expect(result.summary).toEqual({
     source_recipes: 2,
@@ -123,6 +123,9 @@ test("@claim:cli-capabilities inventories, hashes, compares, and reports the sam
   expect(report).toContain("Choose an owner for **Lemon Pasta**");
   expect(report).toContain("Recreate household access for **Lemon Pasta**");
   expect(JSON.parse(readFileSync(result.outputs.inventory, "utf8")).possible_duplicates).toHaveLength(1);
+  await page.goto("/");
+  await expect(page.locator(".facts li").nth(1)).toContainText("Writes a checklist and a JSON inventory you can review before importing.");
+  expect(readFileSync("README.md", "utf8")).toContain("The JSON inventory is a JSON file for scripts or another recipe tool.");
   removeDemo(result);
 });
 
@@ -362,6 +365,29 @@ test("@claim:planning-pack verifies $19 access and downloads the stated contents
   expect(contents).toContain("Resolve possible duplicates");
 });
 
+test("@claim:billing-roles matches the recorded checkout disclosure on every purchase page", async ({ page }) => {
+  const fixture = JSON.parse(readFileSync("tests/fixtures/dodo-checkout-disclosure.json", "utf8")) as {
+    checkout_endpoint: string;
+    redirect_origin: string;
+    checkout_title: string;
+    checkout_footer: string;
+    product_disclosure: string;
+  };
+  expect(fixture.checkout_title).toBe("Sociobot | Checkout");
+  expect(fixture.redirect_origin).toBe("https://checkout.dodopayments.com");
+  expect(fixture.checkout_footer).toContain("online reseller & Merchant of Record");
+  expect(fixture.checkout_footer).toContain("order-related inquiries and returns");
+
+  await page.goto("/");
+  await expect(page.getByText(fixture.product_disclosure, { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Buy the planning pack" })).toHaveAttribute("href", fixture.checkout_endpoint);
+
+  await page.goto("/terms");
+  await expect(page.getByText(fixture.product_disclosure, { exact: true })).toBeVisible();
+  await expect(page.getByText("Sociobot and Dodo are the merchant of record.")).toHaveCount(0);
+  await expect(page.getByText("Refunds are handled there.")).toHaveCount(0);
+});
+
 test("@claim:crate-package contains only consumer CLI material", async () => {
   const listing = execFileSync("cargo", ["package", "--allow-dirty", "--no-verify", "--list"], {
     cwd: process.cwd(),
@@ -473,4 +499,15 @@ test("release output has dedicated routes, legal links, a real 404, and cache po
   expect(immutable.headers["Cache-Control"]).toContain("immutable");
   const sitemap = readFileSync(join(process.cwd(), "dist/site/sitemap.xml"), "utf8");
   for (const route of ["/demo", "/privacy", "/terms"]) expect(sitemap).toContain(`sociobot.in${route}`);
+});
+
+test("every declared claim has exactly one tagged outcome test", async () => {
+  const claims = JSON.parse(readFileSync(".factory/claims.json", "utf8")) as Array<{ id: string; test: string }>;
+  const source = readFileSync("tests/site.spec.ts", "utf8");
+  const ids = claims.map(claim => claim.id);
+  expect(new Set(ids).size).toBe(ids.length);
+  for (const claim of claims) {
+    expect(claim.test).toBe(`npm test -- --grep @claim:${claim.id}`);
+    expect(source.split(`@claim:${claim.id}`).length - 1).toBe(1);
+  }
 });

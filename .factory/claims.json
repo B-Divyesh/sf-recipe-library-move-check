@@ -91,6 +91,13 @@
     "sandbox": "fresh browser with a recorded valid Sociobot response; download and inspect the Markdown contents"
   },
   {
+    "id": "billing-roles",
+    "claim": "Dodo Payments is the online reseller and merchant of record, and handles order questions and returns.",
+    "where": "landing paid section and terms",
+    "test": "npm test -- --grep @claim:billing-roles",
+    "sandbox": "fresh browser context; compare landing and terms disclosures with the recorded checkout footer and assert the Sociobot checkout route"
+  },
+  {
     "id": "crate-package",
     "claim": "The published crate contains only the consumer CLI, documentation, license, changelog, and shipped examples.",
     "where": "README install and package",

@@ -1,6 +1,6 @@
-# Copy audit — polish round 1
+# Copy audit — polish round 2
 
-Audited 29 August 2026. Counts treat product names, commands, paths, and prices as one word. No landing-page sentence exceeds 22 words. No copy uses a banned marketing word.
+Audited 29 August 2026 after the round-two rewrites. Counts treat product names, commands, paths, and prices as one word. No landing-page sentence exceeds 22 words. No copy uses a banned marketing word.
 
 ## First screen
 
@@ -12,7 +12,7 @@ Audited 29 August 2026. Counts treat product names, commands, paths, and prices 
 | Try it with sample data | 5 | Pass; primary action |
 | See a completed check in one click. | 7 | Pass |
 | Runs locally on the folders you select. | 7 | Pass; cli-local-only |
-| Writes a checklist and JSON inventory. | 6 | Pass; cli-capabilities |
+| Writes a checklist and a JSON inventory you can review before importing. | 12 | Pass; defines the file on first use; cli-capabilities |
 | The CLI is free. | 4 | Pass; free-cli |
 | The planning pack costs $19 once. | 6 | Pass; planning-pack |
 
@@ -59,8 +59,8 @@ Audited 29 August 2026. Counts treat product names, commands, paths, and prices 
 | Buy the planning pack | 4 | Pass |
 | Enter license token | 3 | Pass |
 | Verify license | 2 | Pass |
-| Sociobot is the merchant of record. | 6 | Pass |
-| Refunds are handled there. | 4 | Pass |
+| Dodo Payments is the online reseller and merchant of record. | 10 | Pass; billing-roles |
+| Use the support link in your Dodo receipt for order questions and returns. | 13 | Pass; concrete refund route; billing-roles |
 | Download planning pack | 3 | Pass |
 
 ## Footer
@@ -82,4 +82,19 @@ Audited 29 August 2026. Counts treat product names, commands, paths, and prices 
 | Library already present | existing library |
 | Human-readable output | checklist |
 
-The old terms “preflight,” “collision,” “likely duplicate,” and prose phrase “neutral inventory” were removed from visitor-facing copy.
+The old terms “preflight,” “collision,” “likely duplicate,” and prose phrase “neutral inventory” remain absent from visitor-facing copy. “JSON inventory” is defined on first use and in the README.
+
+## README definition added in round 2
+
+| Text | Words | Result |
+| --- | ---: | --- |
+| The JSON inventory is a JSON file for scripts or another recipe tool. | 13 | Pass; defines the format and its use |
+
+## Terms disclosure added in round 2
+
+| Text | Words | Result |
+| --- | ---: | --- |
+| The planning pack is a one-time purchase. | 7 | Pass; planning-pack |
+| Dodo Payments is the online reseller and merchant of record. | 10 | Pass; billing-roles |
+| Use the support link in your Dodo receipt for order questions and returns. | 13 | Pass; billing-roles |
+| The free checker remains available. | 5 | Pass; free-cli |

@@ -30,7 +30,7 @@ The source is the library you plan to move. The destination is the existing libr
 
 The checker reads the two folders and writes only the two paths you name. It does not change either export.
 
-For scripts, print the complete result as JSON:
+The JSON inventory is a JSON file for scripts or another recipe tool. Print the complete result as JSON:
 
 ```sh
 cargo run -- check \

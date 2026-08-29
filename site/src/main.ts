@@ -32,7 +32,7 @@ function footer(): string {
 function facts(): string {
   return `<ul class="facts" aria-label="Product facts">
     <li><span aria-hidden="true">⌂</span> Runs locally on the folders you select.</li>
-    <li><span aria-hidden="true">×</span> Writes a checklist and JSON inventory.</li>
+    <li><span aria-hidden="true">×</span> Writes a checklist and a JSON inventory you can review before importing.</li>
     <li><span aria-hidden="true">$</span> The CLI is free. The planning pack costs $19 once.</li>
   </ul>`;
 }
@@ -66,7 +66,7 @@ function paidSection(): string {
       <a class="button button-dark" href="${API}/products/${SLUG}/checkout">Buy the planning pack</a>
       <button class="text-button" id="restore-toggle" type="button">Enter license token</button>
       <form id="license-form" class="license-form" hidden><label for="license">License token</label><div><input id="license" name="license" autocomplete="off" required><button class="button button-small" type="submit">Verify license</button></div></form>
-      <p id="license-status" class="small" aria-live="polite">Sociobot is the merchant of record. Refunds are handled there.</p>
+      <p id="license-status" class="small" aria-live="polite">Dodo Payments is the online reseller and merchant of record. Use the support link in your Dodo receipt for order questions and returns.</p>
       <button id="download-pack" class="button button-paper" type="button" hidden>Download planning pack</button>
     </div>
   </section>`;
@@ -103,7 +103,7 @@ function demoPage(): string {
 function policyPage(kind: "privacy" | "terms"): string {
   const privacy = kind === "privacy";
   return `${header()}<main id="main" class="policy shell"><p class="eyebrow">Last updated 29 August 2026</p><h1 tabindex="-1">${privacy ? "Privacy in plain words" : "Terms for using this checker"}</h1>
-    ${privacy ? `<section><h2>The CLI uses selected folders</h2><p>The checker reads the export folders you choose. It writes the checklist and inventory paths you choose.</p></section><section><h2>The sample does not use your recipes</h2><p>The site demo uses fixed fictional recipes. Demo state uses a separate <code>demo:</code> browser key. Resetting or leaving the demo removes that key.</p></section><section><h2>License checks</h2><p>If you buy the optional planning pack, the site stores your license token and a dated verdict in this browser.</p><p>It sends only that token to Sociobot for verification. Delete the site’s local storage to remove both values.</p></section><section><h2>Site logs</h2><p>The host may keep standard security logs.</p></section>` : `<section><h2>Use it as a check</h2><p>Similarity scores are review hints. They do not prove that two recipes are the same. Keep backups and test a small import first.</p></section><section><h2>Your content remains yours</h2><p>You are responsible for the recipes and images you inspect or move. An image hash is metadata. It does not grant a right to copy an image.</p></section><section><h2>The free checker</h2><p>The CLI, Markdown checklist, and JSON inventory are provided under the MIT License. They come without a warranty.</p></section><section><h2>The $19 planning pack</h2><p>The planning pack is a one-time purchase. Sociobot and Dodo are the merchant of record.</p><p>A refund revokes the license. The free checker remains available.</p></section>`}
+    ${privacy ? `<section><h2>The CLI uses selected folders</h2><p>The checker reads the export folders you choose. It writes the checklist and inventory paths you choose.</p></section><section><h2>The sample does not use your recipes</h2><p>The site demo uses fixed fictional recipes. Demo state uses a separate <code>demo:</code> browser key. Resetting or leaving the demo removes that key.</p></section><section><h2>License checks</h2><p>If you buy the optional planning pack, the site stores your license token and a dated verdict in this browser.</p><p>It sends only that token to Sociobot for verification. Delete the site’s local storage to remove both values.</p></section><section><h2>Site logs</h2><p>The host may keep standard security logs.</p></section>` : `<section><h2>Use it as a check</h2><p>Similarity scores are review hints. They do not prove that two recipes are the same. Keep backups and test a small import first.</p></section><section><h2>Your content remains yours</h2><p>You are responsible for the recipes and images you inspect or move. An image hash is metadata. It does not grant a right to copy an image.</p></section><section><h2>The free checker</h2><p>The CLI, Markdown checklist, and JSON inventory are provided under the MIT License. They come without a warranty.</p></section><section><h2>The $19 planning pack</h2><p>The planning pack is a one-time purchase.</p><p>Dodo Payments is the online reseller and merchant of record. Use the support link in your Dodo receipt for order questions and returns.</p><p>The free checker remains available.</p></section>`}
   </main>${footer()}`;
 }
 

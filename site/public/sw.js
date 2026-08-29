@@ -1,4 +1,4 @@
-const CACHE = "recipe-move-check-v6";
+const CACHE = "recipe-move-check-v7";
 const SHELL = ["/", "/?demo=1", "/demo", "/privacy", "/terms", "/notebook-migration.98e3f6.webp", "/terminal-recording.4a32d1.svg", "/favicon.4bc1a9.svg"];
 self.addEventListener("install", event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting())));
 self.addEventListener("activate", event => event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key)))).then(() => self.clients.claim())));
